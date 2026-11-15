@@ -2,7 +2,7 @@
 
 English | [简体中文](PRIVACY.zh-CN.md)
 
-AudioPorter connects to Bilibili and the media hosts selected by its extractor to
+AudioRaven connects to Bilibili and the media hosts selected by its extractor to
 list and download requested content. Optional cookies are sent to the relevant
 site as authentication. No analytics, remote configuration, or automatic crash
 uploads are implemented. Updating source dependencies through pip contacts the
@@ -14,8 +14,8 @@ package registry; it is a development action, not an in-app background update.
   preferences. On Windows this normally uses the current user's registry; on
   macOS it uses the user's preferences store. Cookie file paths may be saved;
   cookie contents and passwords are not stored in Qt settings.
-- Destination folders contain `.audioporter-completed.json`, `.audioporter-report.json`,
-  `.audioporter-work/`, and, when used, `.audioporter-music.json`. These may reveal video
+- Destination folders contain `.audioraven-completed.json`, `.audioraven-report.json`,
+  `.audioraven-work/`, and, when used, `.audioraven-music.json`. These may reveal video
   titles, links, file paths, and local Music identifiers.
 - Temporary copies of cookie files are created for isolated workers and removed
   when the supervising operation finishes. Forced termination of the entire app

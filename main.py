@@ -3,12 +3,12 @@ import sys
 
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "--worker":
-        from audioporter.worker import main
+        from audioraven.worker import main
         sys.argv.pop(1)
         raise SystemExit(main())
     elif len(sys.argv) > 1 and sys.argv[1] == "--smoke-test":
-        from audioporter.smoke import main
+        from audioraven.smoke import main
         raise SystemExit(main(sys.argv[2:]))
     else:
-        from audioporter.app import main
+        from audioraven.app import main
         main()

@@ -15,8 +15,8 @@ from PySide6.QtWidgets import (
     QStyledItemDelegate, QTableWidgetItem, QVBoxLayout, QWidget,
 )
 
-from audioporter.backend import BatchRunner, Settings, Track
-from audioporter import DISPLAY_NAME, __version__
+from audioraven.backend import BatchRunner, Settings, Track
+from audioraven import DISPLAY_NAME, __version__
 
 PLATFORM = sys.platform
 
@@ -120,7 +120,7 @@ class Job(QThread):
             # dedicated thread without occupying any parallel download slots.
             with self._music_pool_lock:
                 if self._music_pool is None:
-                    self._music_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="AudioPorter-Music")
+                    self._music_pool = ThreadPoolExecutor(max_workers=1, thread_name_prefix="AudioRaven-Music")
                 self._music_pool.submit(self.import_to_music, dict(event))
 
     def wait_for_music(self):
@@ -135,13 +135,13 @@ class Job(QThread):
             return
         try:
             if self.importer is None:
-                from audioporter.music import MusicImporter
+                from audioraven.music import MusicImporter
                 self.importer = MusicImporter(self.settings.destination)
             self.event.emit({"type": "log", "message": "Adding completed audio to Apple Music…"})
             result = self.importer.import_files(event["files"], cancel_event=self.music_cancel)
             count = result.get("imported", 0) + result.get("already_imported", 0)
             self.imported += count
-            self.event.emit({"type": "music", "index": event["index"], "message": f"{count} audio file(s) available in the AudioPorter playlist."})
+            self.event.emit({"type": "music", "index": event["index"], "message": f"{count} audio file(s) available in the AudioRaven playlist."})
         except Exception as exc:
             self.import_errors += 1
             self.music_paused = True
@@ -167,7 +167,7 @@ class Window(QMainWindow):
         self.setWindowTitle(f"{DISPLAY_NAME} {__version__} — Collection audio downloader")
         self.resize(1060, 880)
         self.setMinimumSize(920, 760)
-        self.prefs = preferences if preferences is not None else QSettings("AudioPorter", "AudioPorter")
+        self.prefs = preferences if preferences is not None else QSettings("AudioRaven", "AudioRaven")
         if preferences is None and not self.prefs.allKeys():
             previous = QSettings('BiliSong', 'BiliSong')
             for key in previous.allKeys():
@@ -221,7 +221,7 @@ class Window(QMainWindow):
         form.addLayout(labels)
         destination_row = QHBoxLayout()
         music_dir = QStandardPaths.writableLocation(QStandardPaths.StandardLocation.MusicLocation)
-        self.destination = QLineEdit(str(self.prefs.value("destination", str(Path(music_dir or Path.home()) / "AudioPorter"))))
+        self.destination = QLineEdit(str(self.prefs.value("destination", str(Path(music_dir or Path.home()) / "AudioRaven"))))
         self.destination.setAccessibleName("Destination folder")
         self.browse = QPushButton("Choose folder…")
         self.browse.clicked.connect(self.choose_destination)
@@ -255,7 +255,7 @@ class Window(QMainWindow):
         self.format.currentIndexChanged.connect(self.update_quality_options)
         self.update_quality_options()
 
-        self.add_music = QCheckBox("Add completed songs to Apple Music → AudioPorter playlist")
+        self.add_music = QCheckBox("Add completed songs to Apple Music → AudioRaven playlist")
         self.add_music.setChecked(PLATFORM == "darwin" and str(self.prefs.value("add_to_music", "true")).lower() == "true")
         self.add_music.setVisible(PLATFORM == "darwin")
         self.add_music.setToolTip("Imports each saved audio file immediately. macOS may ask to allow control of Music. Does not require an Apple Music subscription.")
@@ -637,7 +637,7 @@ class Window(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setApplicationName("AudioPorter")
+    app.setApplicationName("AudioRaven")
     app.setApplicationDisplayName(DISPLAY_NAME)
     apply_theme(app)
     window = Window()

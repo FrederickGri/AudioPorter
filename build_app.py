@@ -10,20 +10,20 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 
-from audioporter import __version__
+from audioraven import __version__
 
 SOURCE_FILES = ("main.py", "build_app.py", "requirements.txt", "requirements-dev.txt",
                 "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md", "CHANGELOG.md",
                 "CONTRIBUTING.md", "SECURITY.md", ".gitignore",
                 "README.zh-CN.md", "LICENSE.zh-CN.md", "THIRD_PARTY_NOTICES.zh-CN.md",
                 "CHANGELOG.zh-CN.md", "CONTRIBUTING.zh-CN.md", "SECURITY.zh-CN.md")
-SOURCE_DIRS = ("audioporter", "assets", "docs", "scripts", "tests", ".github", "licenses")
+SOURCE_DIRS = ("audioraven", "assets", "docs", "scripts", "tests", ".github", "licenses")
 
 SPEC = '''# Generated in an isolated staging directory; never commit this file.
 import sys
 from PyInstaller.utils.hooks import collect_all, copy_metadata
 
-datas, binaries, hiddenimports = [], [], ['audioporter.worker', 'audioporter.music', 'audioporter.smoke']
+datas, binaries, hiddenimports = [], [], ['audioraven.worker', 'audioraven.music', 'audioraven.smoke']
 for package in ('yt_dlp', 'imageio_ffmpeg'):
     package_data, package_binaries, package_imports = collect_all(package)
     datas += package_data
@@ -38,21 +38,21 @@ a = Analysis(
 )
 pyz = PYZ(a.pure)
 exe = EXE(
-    pyz, a.scripts, [], exclude_binaries=True, name='AudioPorter',
+    pyz, a.scripts, [], exclude_binaries=True, name='AudioRaven',
     debug=False, bootloader_ignore_signals=False, strip=False, upx=False,
     console=(sys.platform == 'win32'), hide_console='hide-early',
     disable_windowed_traceback=False, argv_emulation=False,
     icon={icon}, target_arch=None, codesign_identity=None, entitlements_file=None,
 )
-coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name='AudioPorter')
+coll = COLLECT(exe, a.binaries, a.datas, strip=False, upx=False, name='AudioRaven')
 if sys.platform == 'darwin':
     app = BUNDLE(
-        coll, name='AudioPorter.app', icon={icon},
-        bundle_identifier='org.audioporter.desktop',
+        coll, name='AudioRaven.app', icon={icon},
+        bundle_identifier='org.audioraven.desktop',
         info_plist={{
             'CFBundleShortVersionString': {version},
-            'CFBundleDisplayName': '收藏夹血鸦 · AudioPorter',
-            'NSAppleEventsUsageDescription': 'AudioPorter adds downloaded audio to your Music library when you enable automatic import.',
+            'CFBundleDisplayName': '收藏夹血鸦 · AudioRaven',
+            'NSAppleEventsUsageDescription': 'AudioRaven adds downloaded audio to your Music library when you enable automatic import.',
         }},
     )
 '''
@@ -75,13 +75,13 @@ def main() -> int:
         parser.error('Build on macOS or Windows. Cross-compiling is not supported.')
     root = Path(__file__).resolve().parent
     dist = root / 'dist'
-    with tempfile.TemporaryDirectory(prefix='audioporter-build-') as temporary:
+    with tempfile.TemporaryDirectory(prefix='audioraven-build-') as temporary:
         stage = Path(temporary) / 'source'
         native_dist = Path(temporary) / 'dist'
         stage_source(root, stage)
         subprocess.run([sys.executable, 'scripts/collect_licenses.py'], cwd=stage, check=True)
-        icon = 'assets/AudioPorter.icns' if sys.platform == 'darwin' else 'assets/AudioPorter.ico'
-        spec = stage / 'AudioPorter.spec'
+        icon = 'assets/AudioRaven.icns' if sys.platform == 'darwin' else 'assets/AudioRaven.ico'
+        spec = stage / 'AudioRaven.spec'
         spec.write_text(SPEC.format(icon=repr(icon), version=repr(__version__),
                                    notices=repr('THIRD_PARTY_NOTICES.md'),
                                    licenses=repr('licenses')), encoding='utf-8')
@@ -89,7 +89,7 @@ def main() -> int:
             sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean',
             '--distpath', str(native_dist), '--workpath', str(Path(temporary) / 'build'), str(spec),
         ], cwd=stage, check=True)
-        name = 'AudioPorter.app' if sys.platform == 'darwin' else 'AudioPorter'
+        name = 'AudioRaven.app' if sys.platform == 'darwin' else 'AudioRaven'
         dist.mkdir(exist_ok=True)
         built = native_dist / name
         if (dist / name).exists():
@@ -110,7 +110,7 @@ def main() -> int:
             shutil.copytree(stage / 'licenses', release / 'licenses')
             shutil.copytree(stage / 'docs', release / 'docs')
             shutil.copy2(stage / 'CHANGELOG.md', release / 'CHANGELOG.md')
-            target = f"AudioPorter-{__version__}-{'macOS' if sys.platform == 'darwin' else 'Windows'}-{platform.machine().lower()}"
+            target = f"AudioRaven-{__version__}-{'macOS' if sys.platform == 'darwin' else 'Windows'}-{platform.machine().lower()}"
             archive = dist / (target + '.zip')
             if sys.platform == 'darwin':
                 subprocess.run(['/usr/bin/ditto', '-c', '-k', '--keepParent', '--norsrc',
@@ -118,7 +118,7 @@ def main() -> int:
             else:
                 shutil.make_archive(str(dist / target), 'zip', release)
             print(f'Release archive: {archive.name}')
-    print('Built AudioPorter for ' + platform.system())
+    print('Built AudioRaven for ' + platform.system())
     return 0
 
 

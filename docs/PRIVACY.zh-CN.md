@@ -2,12 +2,12 @@
 
 [English](PRIVACY.md) | 简体中文
 
-AudioPorter 为读取列表和下载内容，会连接 B 站及提取器选择的媒体服务器。可选 Cookie 用于对相应网站进行身份验证。应用未实现分析统计、远程配置或崩溃自动上传。开发时通过 pip 更新依赖会连接软件包仓库，这不是应用内的后台更新。
+AudioRaven 为读取列表和下载内容，会连接 B 站及提取器选择的媒体服务器。可选 Cookie 用于对相应网站进行身份验证。应用未实现分析统计、远程配置或崩溃自动上传。开发时通过 pip 更新依赖会连接软件包仓库，这不是应用内的后台更新。
 
 ## 本地记录
 
 - Qt 设置保存最近的输入链接、目录、格式、质量和界面偏好。Windows 通常保存在当前用户注册表，macOS 保存在用户偏好存储。可能保存 Cookie 文件路径，但不保存 Cookie 内容或密码。
-- 下载目录中的 `.audioporter-completed.json`、`.audioporter-report.json`、`.audioporter-work/` 及可选 `.audioporter-music.json` 可能包含视频标题、链接、文件路径和本地 Music 标识。
+- 下载目录中的 `.audioraven-completed.json`、`.audioraven-report.json`、`.audioraven-work/` 及可选 `.audioraven-music.json` 可能包含视频标题、链接、文件路径和本地 Music 标识。
 - 隔离工作进程使用 Cookie 的临时副本，正常结束后由主进程删除。整个应用被强制终止或系统崩溃，可能绕过正常清理。
 - 改名前 BiliSong 的设置与下载 / Music 记录可在本机沿用；迁移不会上传这些记录。
 

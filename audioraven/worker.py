@@ -160,7 +160,7 @@ def download(config: dict) -> dict:
     track_key = hashlib.sha256(config["track"]["url"].encode()).hexdigest()[:24]
     profile = config.get("audio_quality", "best") if config["audio_format"] == "mp3" else "source"
     output_dir = destination / config["audio_format"] / profile
-    staging = destination / ".audioporter-work" / config["audio_format"] / profile / track_key
+    staging = destination / ".audioraven-work" / config["audio_format"] / profile / track_key
     staging.mkdir(parents=True, exist_ok=True)
     # A killed converter may leave a plausible-looking but incomplete output.
     # Only files promoted out of staging are trusted. Keep .part downloads for

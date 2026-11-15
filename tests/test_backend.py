@@ -7,7 +7,7 @@ import time
 
 import pytest
 
-from audioporter.backend import BatchRunner, CancelledError, Settings, Track, normalize_url, safe_message
+from audioraven.backend import BatchRunner, CancelledError, Settings, Track, normalize_url, safe_message
 
 
 def assert_process_exited(pid):
@@ -94,7 +94,7 @@ def test_exhausted_entry_does_not_stop_remaining_batch(tmp_path, monkeypatch):
     assert delays == [2, 4]
     result = events[-1]
     assert result["failed"] == 1 and result["completed"] == 2
-    report = json.loads((tmp_path / ".audioporter-report.json").read_text())
+    report = json.loads((tmp_path / ".audioraven-report.json").read_text())
     assert [entry["status"] for entry in report["entries"]] == ["failed", "completed", "completed"]
 
 
@@ -155,7 +155,7 @@ def test_cancel_during_backoff_does_not_start_next_entry(tmp_path, monkeypatch):
     runner.download(tracks())
     assert attempts == [0]
     assert events[-1]["cancelled"] is True
-    report = json.loads((tmp_path / ".audioporter-report.json").read_text())
+    report = json.loads((tmp_path / ".audioraven-report.json").read_text())
     assert [entry["status"] for entry in report["entries"]] == ["cancelled", "pending", "pending"]
 
 

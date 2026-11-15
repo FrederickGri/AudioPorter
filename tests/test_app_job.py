@@ -1,14 +1,14 @@
 """Check the boundary between successful downloads and optional Music imports."""
 from PySide6.QtCore import Qt
 import threading
-from audioporter.app import Job
-from audioporter.backend import Settings
+from audioraven.app import Job
+from audioraven.backend import Settings
 import pytest
 
 
 @pytest.fixture(autouse=True)
 def mac_music_platform(monkeypatch):
-    monkeypatch.setattr('audioporter.app.PLATFORM', 'darwin')
+    monkeypatch.setattr('audioraven.app.PLATFORM', 'darwin')
 
 
 class Importer:

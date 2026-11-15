@@ -5,8 +5,8 @@ import subprocess
 import sys
 
 root = Path(__file__).resolve().parents[1]
-executable = root / 'dist' / ('AudioPorter.app/Contents/MacOS/AudioPorter' if sys.platform == 'darwin'
-                            else 'AudioPorter/AudioPorter.exe')
+executable = root / 'dist' / ('AudioRaven.app/Contents/MacOS/AudioRaven' if sys.platform == 'darwin'
+                            else 'AudioRaven/AudioRaven.exe')
 report = root / 'dist' / 'smoke-result.json'
 result = subprocess.run([str(executable), '--smoke-test', str(report)], timeout=120)
 if result.returncode or not report.is_file() or not json.loads(report.read_text(encoding='utf-8')).get('ok'):

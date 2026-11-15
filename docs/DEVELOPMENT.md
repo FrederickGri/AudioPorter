@@ -14,8 +14,8 @@ python scripts/privacy_audit.py
 
 Run these commands with the virtual environment's Python (see README for each
 OS). The privacy source check requires the intended upload files to be staged in
-Git. To check a binary, use `python scripts/privacy_audit.py --tree dist/AudioPorter.app`
-on macOS or `--tree dist/AudioPorter` on Windows. Test the extracted ZIP too.
+Git. To check a binary, use `python scripts/privacy_audit.py --tree dist/AudioRaven.app`
+on macOS or `--tree dist/AudioRaven` on Windows. Test the extracted ZIP too.
 
 PyInstaller is not a cross-compiler. Windows builds on Windows, Intel Mac builds
 on Intel, and Apple Silicon builds on Apple Silicon. `build_app.py` creates an
@@ -35,7 +35,7 @@ library modifications, replace the corresponding unpacked Qt/PySide library
 files, or rebuild from source using modified libraries in your environment.
 If changing a Mac bundle invalidates its ad-hoc signature, use the standard
 local development signing process before running your modified build. No
-proprietary AudioPorter signing key is needed to rebuild it.
+proprietary AudioRaven signing key is needed to rebuild it.
 
 Windows Job Objects are attached before a worker receives configuration. If
 attaching fails, the app terminates that worker and reports the error instead of

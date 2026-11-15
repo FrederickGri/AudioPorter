@@ -11,5 +11,5 @@ Use synthetic fixtures and public placeholder URLs. Never commit cookies,
 private folder URLs, downloaded songs, personal paths, local settings, or raw
 account logs. Review screenshots and error messages before posting an issue.
 
-Contributions to original AudioPorter code use the repository's MIT license.
+Contributions to original AudioRaven code use the repository's MIT license.
 Keep English and Simplified Chinese project documentation in sync.

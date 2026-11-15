@@ -17,7 +17,7 @@ import types
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-PRIVATE_NAMES = re.compile(r'(^|/)(\.env(?:\..*)?|cookies(?:[^/]*\.(?:txt|json|sqlite|db))?|[^/]*cookies\.txt|\.(?:audioporter|bilisong)-[^/]*|\.DS_Store|.*\.(?:pem|key|part|ytdl))$', re.I)
+PRIVATE_NAMES = re.compile(r'(^|/)(\.env(?:\..*)?|cookies(?:[^/]*\.(?:txt|json|sqlite|db))?|[^/]*cookies\.txt|\.(?:audioraven|bilisong)-[^/]*|\.DS_Store|.*\.(?:pem|key|part|ytdl))$', re.I)
 
 
 def main():
@@ -64,7 +64,7 @@ def main():
         check(data, label)
         if data.startswith(b'PK\x03\x04'):
             check_zip(data, label)
-        if path.name in {'AudioPorter', 'AudioPorter.exe'}:
+        if path.name in {'AudioRaven', 'AudioRaven.exe'}:
             from PyInstaller.archive.readers import CArchiveReader
             archive = CArchiveReader(str(path))
             for name, entry in archive.toc.items():

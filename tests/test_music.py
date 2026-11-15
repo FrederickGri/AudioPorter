@@ -9,13 +9,13 @@ import time
 
 import pytest
 
-from audioporter.backend import CancelledError
-from audioporter.music import IMPORT_SCRIPT, MusicImporter
+from audioraven.backend import CancelledError
+from audioraven.music import IMPORT_SCRIPT, MusicImporter
 
 
 @pytest.fixture
 def importer(tmp_path, monkeypatch):
-    monkeypatch.setattr("audioporter.music.sys.platform", "darwin")
+    monkeypatch.setattr("audioraven.music.sys.platform", "darwin")
     return MusicImporter(str(tmp_path))
 
 
@@ -149,10 +149,10 @@ def test_manifest_write_failure_stops_before_import(importer, monkeypatch):
     def cannot_replace(*args):
         raise PermissionError("Destination is not writable")
 
-    monkeypatch.setattr("audioporter.music.os.replace", cannot_replace)
+    monkeypatch.setattr("audioraven.music.os.replace", cannot_replace)
     with pytest.raises(RuntimeError, match="destination is writable"):
         importer.import_files(["test.mp3"])
-    assert not list(importer.destination.glob(".audioporter-music-*.tmp"))
+    assert not list(importer.destination.glob(".audioraven-music-*.tmp"))
     assert (importer.destination / "test.mp3").is_file()
 
 
@@ -177,7 +177,7 @@ def test_script_paths_are_passed_only_as_arguments(importer, monkeypatch):
         captured.append((args, kwargs))
         return CompletedProcess()
 
-    monkeypatch.setattr("audioporter.music.subprocess.Popen", spawn)
+    monkeypatch.setattr("audioraven.music.subprocess.Popen", spawn)
     assert importer._import_one(source, "", None) == ("imported", "0123456789ABCDEF")
     args, kwargs = captured[0]
     assert args == ["/usr/bin/osascript", "-e", IMPORT_SCRIPT, str(source), ""]
@@ -188,7 +188,7 @@ def test_script_paths_are_passed_only_as_arguments(importer, monkeypatch):
 
 def test_automation_denial_explains_fix_and_preserves_audio(importer, monkeypatch):
     source = audio(importer)
-    monkeypatch.setattr("audioporter.music.subprocess.Popen", lambda *a, **k: CompletedProcess(error="Not authorized to send Apple events to Music. (-1743)", returncode=1))
+    monkeypatch.setattr("audioraven.music.subprocess.Popen", lambda *a, **k: CompletedProcess(error="Not authorized to send Apple events to Music. (-1743)", returncode=1))
     with pytest.raises(RuntimeError, match="Privacy & Security → Automation"):
         importer.import_files(["test.mp3"])
     assert source.read_bytes() == b"synthetic test bytes"
@@ -198,7 +198,7 @@ def test_automation_denial_explains_fix_and_preserves_audio(importer, monkeypatc
 @pytest.mark.parametrize("reply", ["", "imported\tbad-id", "unexpected\t0123456789ABCDEF"])
 def test_unconfirmed_import_is_not_recorded(importer, monkeypatch, reply):
     audio(importer)
-    monkeypatch.setattr("audioporter.music.subprocess.Popen", lambda *a, **k: CompletedProcess(output=reply))
+    monkeypatch.setattr("audioraven.music.subprocess.Popen", lambda *a, **k: CompletedProcess(output=reply))
     with pytest.raises(RuntimeError, match="did not confirm"):
         importer.import_files(["test.mp3"])
     assert json.loads(importer.manifest_path.read_text())["files"] == {}
@@ -217,7 +217,7 @@ def test_timeout_or_cancellation_kills_supervised_process(importer, monkeypatch,
         children.append(process)
         return process
 
-    monkeypatch.setattr("audioporter.music.subprocess.Popen", fake_music)
+    monkeypatch.setattr("audioraven.music.subprocess.Popen", fake_music)
     event = threading.Event()
     if cancel:
         timer = threading.Timer(0.15, event.set)
@@ -239,7 +239,7 @@ def test_timeout_or_cancellation_kills_supervised_process(importer, monkeypatch,
 def test_cancelled_before_start_never_invokes_music(importer, monkeypatch):
     event = threading.Event()
     event.set()
-    monkeypatch.setattr("audioporter.music.subprocess.Popen", lambda *a, **k: pytest.fail("Must not invoke Music"))
+    monkeypatch.setattr("audioraven.music.subprocess.Popen", lambda *a, **k: pytest.fail("Must not invoke Music"))
     with pytest.raises(CancelledError):
         importer.import_files([], event)
 

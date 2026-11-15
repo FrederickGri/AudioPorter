@@ -4,7 +4,7 @@ English | [简体中文](CHANGELOG.zh-CN.md)
 
 ## 0.3.0
 
-- Rename the app to AudioPorter / 收藏夹血鸦 and add English/Chinese documentation.
+- Rename the app to AudioRaven / 收藏夹血鸦 and add English/Chinese documentation.
 
 - Add native Windows packaging, ICO icon, Windows fonts, and system Music folder.
 - Supervise Windows workers and FFmpeg with kill-on-close Job Objects.

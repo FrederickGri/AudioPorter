@@ -8,8 +8,8 @@ import time
 import pytest
 from yt_dlp import YoutubeDL
 
-from audioporter.backend import BatchRunner, Settings, Track
-from audioporter.worker import encoding_options
+from audioraven.backend import BatchRunner, Settings, Track
+from audioraven.worker import encoding_options
 from test_backend import assert_process_exited
 
 
@@ -49,8 +49,8 @@ def test_parallel_workers_overlap_with_bounded_slots_and_safe_history(tmp_path, 
     runner.download(make_tracks())
     assert peak == 3
     assert attempts == {0: 2, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1}
-    history = json.loads((tmp_path / ".audioporter-completed.json").read_text())
-    report = json.loads((tmp_path / ".audioporter-report.json").read_text())
+    history = json.loads((tmp_path / ".audioraven-completed.json").read_text())
+    report = json.loads((tmp_path / ".audioraven-report.json").read_text())
     assert len(history) == report["completed"] == 7
     assert report["failed"] == 0
     assert [r["id"] for r in report["entries"]] == [str(i) for i in range(7)]
@@ -84,7 +84,7 @@ def test_cancel_kills_every_parallel_process_and_never_starts_pending_items(tmp_
     assert len(list(tmp_path.glob("*.pid"))) == 3
     for file in tmp_path.glob("*.pid"):
         assert_process_exited(int(file.read_text()))
-    report = json.loads((tmp_path / ".audioporter-report.json").read_text())
+    report = json.loads((tmp_path / ".audioraven-report.json").read_text())
     assert [r["status"] for r in report["entries"]] == ["cancelled"] * 3 + ["pending"] * 4
     assert events[-1]["cancelled"] is True
 
@@ -94,7 +94,7 @@ def test_quality_upgrade_does_not_reuse_lower_quality_or_legacy_files(tmp_path, 
     track = make_tracks(1)[0]
     (tmp_path / "legacy.mp3").write_bytes(b"old audio")
     legacy = hashlib.sha256((track.url + "\0mp3").encode()).hexdigest()
-    (tmp_path / ".audioporter-completed.json").write_text(json.dumps({legacy: {"files": ["legacy.mp3"]}}))
+    (tmp_path / ".audioraven-completed.json").write_text(json.dumps({legacy: {"files": ["legacy.mp3"]}}))
     calls = []
 
     def worker(*args):
