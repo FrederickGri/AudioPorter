@@ -4,6 +4,8 @@
 
 发行 CI 使用 Python 3.12，本地源码也可使用 Python 3.14。在虚拟环境中安装 `requirements-dev.txt`；运行时和顶层构建依赖均锁定版本。打包前运行 `python -m pytest -q`。
 
+从源码启动或测试前，先运行一次 `python scripts/fetch_font.py`。脚本从固定的上游提交获取 Noto Sans SC 并校验 SHA-256。字体二进制不提交到 Git，会随原生应用发行；构建脚本会在需要时自动获取。打包应用运行时无需下载字体。
+
 ```sh
 python build_app.py --archive
 python scripts/check_package.py

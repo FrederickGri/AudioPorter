@@ -22,14 +22,17 @@ jobs:
         include:
           - os: windows-2022
             label: Windows-amd64
+            qt_platform: windows
           - os: macos-15
             label: macOS-arm64
+            qt_platform: offscreen
           - os: macos-15-intel
             label: macOS-x86_64
+            qt_platform: offscreen
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     env:
-      QT_QPA_PLATFORM: offscreen
+      QT_QPA_PLATFORM: ${{ matrix.qt_platform }}
       PYTHONUTF8: '1'
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -41,6 +44,8 @@ jobs:
           cache: pip
       - name: Install pinned dependencies
         run: python -m pip install -r requirements-dev.txt
+      - name: Fetch checksum-verified interface font
+        run: python scripts/fetch_font.py
       - name: Check tagged version
         if: startsWith(github.ref, 'refs/tags/')
         shell: python
@@ -103,4 +108,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" release/*.zip release/*.sha256 --draft --verify-tag --title "AudioRaven $RELEASE_TAG" --notes "Native Windows x64, Apple Silicon and Intel macOS packages. Each passed native CI tests and packaged offline GUI/audio/worker checks. Windows 11 interactive acceptance and third-party corresponding-source availability must be reviewed before publishing. See docs/COMPATIBILITY.md and docs/RELEASING.md. Packages are unsigned. / 提供 Windows x64、Apple Silicon 与 Intel Mac 原生包，均通过原生 CI 和打包应用离线界面、音频及工作进程检查。发布前需核查 Windows 11 交互验收和第三方对应源码访问；详见中文兼容性与发行指南。软件包未签名。"
+        run: |
+          if existing=$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft 2>/dev/null)
+          then
+            if [ "$existing" != "true" ]
+            then
+              echo "Refusing to overwrite an already published release."
+              exit 1
+            fi
+            gh release upload "$RELEASE_TAG" release/*.zip release/*.sha256 --clobber
+          else
+            gh release create "$RELEASE_TAG" release/*.zip release/*.sha256 --draft --verify-tag --title "AudioRaven $RELEASE_TAG" --notes "Native Windows x64, Apple Silicon and Intel macOS packages. Each passed native CI tests and packaged offline GUI/audio/worker checks. Windows 11 interactive acceptance and third-party corresponding-source availability must be reviewed before publishing. See docs/COMPATIBILITY.md and docs/RELEASING.md. Packages are unsigned. / 提供 Windows x64、Apple Silicon 与 Intel Mac 原生包，均通过原生 CI 和打包应用离线界面、音频及工作进程检查。发布前需核查 Windows 11 交互验收和第三方对应源码访问；详见中文兼容性与发行指南。软件包未签名。"
+          fi

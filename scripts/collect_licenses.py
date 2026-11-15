@@ -41,6 +41,7 @@ def main():
     if not python_license.is_file():
         raise RuntimeError('Python license text not found; release packaging stopped')
     shutil.copyfile(python_license, output / 'Python-LICENSE.txt')
+    shutil.copyfile(root / 'assets/fonts/OFL.txt', output / 'NotoSansSC-OFL.txt')
     (output / 'VERSIONS.txt').write_text('\n'.join(versions) + '\n', encoding='utf-8')
     ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
     records = []

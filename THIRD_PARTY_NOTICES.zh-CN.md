@@ -12,6 +12,7 @@ AudioRaven 原创代码采用 MIT 许可证。依赖保留各自条款；MIT 不
 | imageio-ffmpeg | 定位附带转换器 | BSD-2-Clause；https://github.com/imageio/imageio-ffmpeg |
 | FFmpeg 及启用的库 | 独立转换器进程 | 取决于具体构建的 LGPL / GPL 条款；https://ffmpeg.org/legal.html |
 | PyInstaller 引导程序 | 启动打包应用 | GPL 及 PyInstaller 引导程序例外；https://github.com/pyinstaller/pyinstaller |
+| Noto Sans SC | 随包提供的中英文字体 | SIL Open Font License 1.1；https://github.com/google/fonts/tree/main/ofl/notosanssc |
 
 打包时将实际安装版本和许可证原文收集到 `licenses/`，其中包括间接依赖的声明。第三方许可证原文保持完整，不以本说明代替。
 

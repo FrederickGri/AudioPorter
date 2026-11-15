@@ -37,6 +37,7 @@ To run from source instead, use Python 3.12–3.14 (CI uses 3.12):
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python scripts/fetch_font.py
 .venv/bin/python main.py
 ```
 
@@ -45,6 +46,7 @@ On Windows, use PowerShell (activation is not required):
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe scripts/fetch_font.py
 .\.venv\Scripts\python.exe main.py
 ```
 

@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from PySide6.QtCore import QPointF, QSettings, QStandardPaths, Qt, QThread, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QPainter, QPainterPath, QPalette, QPen, QPolygonF
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QFontDatabase, QPainter, QPainterPath, QPalette, QPen, QPolygonF
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QGridLayout, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QListView, QMainWindow, QMessageBox, QPlainTextEdit,
@@ -19,6 +19,7 @@ from audioraven.backend import BatchRunner, Settings, Track
 from audioraven import DISPLAY_NAME, __version__
 
 PLATFORM = sys.platform
+_FONT_FAMILY = None
 
 STYLE = """
 QMainWindow, QWidget#root { background: #121317; color: #f0e5cf; }
@@ -30,14 +31,14 @@ QLabel#archiveMark { color: #d4b985; font-size: 11px; padding: 6px 0px; }
 QFrame#card { background: #1d1e23; border: 1px solid #655b4d; border-left: 4px solid #9e2737; border-radius: 3px; }
 QFrame#statCard { background: #dfd1b6; border: 1px solid #ad956b; border-left: 4px solid #9e2737; border-radius: 2px; }
 QLabel#field { color: #e2d0ab; font-weight: 600; }
-QLineEdit, QComboBox, QSpinBox { background: #111216; border: 1px solid #746a5b; border-radius: 2px; padding: 9px; selection-background-color: #73313d; selection-color: #fff4df; }
+QLineEdit, QComboBox, QSpinBox { background: #111216; border: 1px solid #746a5b; border-radius: 2px; padding: 7px; selection-background-color: #73313d; selection-color: #fff4df; }
 QLineEdit:focus, QComboBox:focus, QSpinBox:focus { border: 1px solid #d5b678; background: #19191e; }
 QLineEdit:disabled, QComboBox:disabled, QSpinBox:disabled { background: #232329; color: #a89e90; border-color: #4d4841; }
 QComboBox QAbstractItemView { background: #202126; color: #f4e9d2; border: 1px solid #a58c60; selection-background-color: #813140; selection-color: #fff4df; outline: 0; padding: 4px; }
 QComboBox QAbstractItemView::item { min-height: 30px; padding: 5px 10px; color: #f4e9d2; background: #202126; }
 QComboBox QAbstractItemView::item:selected { background: #813140; color: #fff4df; }
 QToolTip { background: #e9dbc0; color: #211e1b; border: 1px solid #a58c60; padding: 7px; }
-QPushButton { background: #29282b; border: 1px solid #8c7858; border-radius: 2px; padding: 10px 15px; font-weight: 600; }
+QPushButton { background: #29282b; border: 1px solid #8c7858; border-radius: 2px; padding: 8px 15px; font-weight: 600; }
 QPushButton:hover { background: #3b2b2e; border-color: #dbc18c; }
 QPushButton:pressed { background: #602b36; }
 QPushButton#primary { background: #9d2436; color: #fff3dd; border: 1px solid #d07476; }
@@ -76,7 +77,15 @@ def apply_theme(app):
         palette.setColor(QPalette.ColorGroup.Disabled, role, QColor("#a89e90"))
     app.setPalette(palette)
     app.setStyleSheet(STYLE)
-    app.setFont(QFont("Segoe UI" if PLATFORM == "win32" else "Helvetica Neue", 13))
+    global _FONT_FAMILY
+    if _FONT_FAMILY is None:
+        resource_root = Path(getattr(sys, '_MEIPASS', Path(__file__).resolve().parent.parent))
+        font_id = QFontDatabase.addApplicationFont(str(resource_root / 'assets/fonts/NotoSansSC.ttf'))
+        families = QFontDatabase.applicationFontFamilies(font_id)
+        if font_id < 0 or not families:
+            raise RuntimeError('The bundled interface font could not be loaded. Extract the complete application package.')
+        _FONT_FAMILY = families[0]
+    app.setFont(QFont(_FONT_FAMILY, 13))
 
 
 def readable_combo():
@@ -230,7 +239,7 @@ class Window(QMainWindow):
         self.setCentralWidget(scroll)
         layout = QVBoxLayout(root)
         layout.setContentsMargins(28, 24, 28, 22)
-        layout.setSpacing(14)
+        layout.setSpacing(12)
 
         top = QHBoxLayout()
         top.setSpacing(18)
@@ -414,7 +423,7 @@ class Window(QMainWindow):
     def stat(parent, label, value):
         card = QFrame(objectName="statCard")
         box = QHBoxLayout(card)
-        box.setContentsMargins(16, 12, 16, 12)
+        box.setContentsMargins(16, 10, 16, 10)
         number = QLabel(value, objectName="statValue")
         box.addWidget(number)
         box.addWidget(QLabel(label, objectName="statLabel"))

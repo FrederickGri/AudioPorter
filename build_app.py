@@ -30,7 +30,7 @@ for package in ('yt_dlp', 'imageio_ffmpeg'):
     binaries += package_binaries
     hiddenimports += package_imports
 datas += copy_metadata('yt-dlp')
-datas += [({notices}, 'notices'), ({licenses}, 'notices/licenses')]
+datas += [({notices}, 'notices'), ({licenses}, 'notices/licenses'), ('assets/fonts', 'assets/fonts')]
 a = Analysis(
     ['main.py'], pathex=['.'], binaries=binaries, datas=datas,
     hiddenimports=hiddenimports, hookspath=[], hooksconfig={{}},
@@ -74,6 +74,7 @@ def main() -> int:
     if sys.platform not in {'darwin', 'win32'}:
         parser.error('Build on macOS or Windows. Cross-compiling is not supported.')
     root = Path(__file__).resolve().parent
+    subprocess.run([sys.executable, str(root / 'scripts' / 'fetch_font.py')], check=True)
     dist = root / 'dist'
     with tempfile.TemporaryDirectory(prefix='audioraven-build-') as temporary:
         stage = Path(temporary) / 'source'

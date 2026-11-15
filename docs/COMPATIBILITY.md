@@ -12,6 +12,10 @@ package and runs the packaged executable to verify the GUI, both audio codecs,
 and the frozen subprocess protocol. Tests use synthetic media and fake network
 boundaries; they do not prove a real account's folder is accessible.
 
+The application bundles Noto Sans SC for English/Chinese glyph coverage. Packaged
+checks require those glyphs to be present; Windows CI renders with the native
+Windows Qt platform plugin rather than relying on a fontless offscreen backend.
+
 No app can guarantee every machine or every future Bilibili response. Release
 only when native checks pass, and record any remaining manual checks in the
 release notes. Windows Stop/timeout uses a kill-on-close Job Object to terminate

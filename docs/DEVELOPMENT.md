@@ -6,6 +6,11 @@ Use Python 3.12 for release CI. The local source also runs on Python 3.14. Insta
 `requirements-dev.txt` into a virtual environment; runtime and top-level build
 dependencies are pinned. Run `python -m pytest -q` before packaging.
 
+Run `python scripts/fetch_font.py` once before source launches or tests. It fetches
+Noto Sans SC from a pinned upstream commit and verifies SHA-256. The font binary
+is excluded from Git and included in native app packages; the build script fetches
+it automatically when needed. Packaged apps need no font download at runtime.
+
 ```sh
 python build_app.py --archive
 python scripts/check_package.py

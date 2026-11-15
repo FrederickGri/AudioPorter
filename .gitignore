@@ -28,3 +28,4 @@ release/
 *.m4a
 *.wav
 *.flac
+assets/fonts/*.ttf

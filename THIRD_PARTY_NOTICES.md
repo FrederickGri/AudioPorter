@@ -13,6 +13,7 @@ the MIT license does not relicense Python, Qt, FFmpeg, or any other dependency.
 | imageio-ffmpeg | Locate bundled converter | BSD-2-Clause; https://github.com/imageio/imageio-ffmpeg |
 | FFmpeg and enabled libraries | Separate converter executable | Build-specific LGPL/GPL terms; https://ffmpeg.org/legal.html |
 | PyInstaller bootloader | Application launcher | GPL with the PyInstaller bootloader exception; https://github.com/pyinstaller/pyinstaller |
+| Noto Sans SC | Bundled English/Chinese interface font | SIL Open Font License 1.1; https://github.com/google/fonts/tree/main/ofl/notosanssc |
 
 Exact installed versions and license texts are collected into `licenses/` during
 packaging, including metadata notices from transitive dependencies. Qt remains

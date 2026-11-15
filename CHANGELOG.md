@@ -6,6 +6,7 @@ English | [简体中文](CHANGELOG.zh-CN.md)
 
 - Rename the app to AudioRaven / 收藏夹血鸦 and add English/Chinese documentation.
 - Add a crimson, bone and brass interface with vector raven heraldry.
+- Bundle an OFL-licensed Chinese/English font and check required glyphs in packaged apps.
 
 - Add native Windows packaging, ICO icon, Windows fonts, and system Music folder.
 - Supervise Windows workers and FFmpeg with kill-on-close Job Objects.

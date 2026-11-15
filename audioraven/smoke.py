@@ -19,12 +19,16 @@ def main(arguments: list[str]) -> int:
         import imageio_ffmpeg
         from PySide6.QtCore import QCoreApplication, QEvent, QSettings, QTimer
         from PySide6.QtWidgets import QApplication
+        from PySide6.QtGui import QFontMetrics
         from .app import Window, apply_theme
         from .backend import BatchRunner, Settings
         with tempfile.TemporaryDirectory(prefix='audioraven-smoke-') as temporary:
             work = Path(temporary)
             app = QApplication.instance() or QApplication(['AudioRaven smoke test'])
             apply_theme(app)
+            metrics = QFontMetrics(app.font())
+            if not all(metrics.inFontUcs4(ord(character)) for character in 'AudioRaven收藏夹血鸦'):
+                raise RuntimeError('The interface font is missing required English or Chinese glyphs')
             window = Window(QSettings(str(work / 'preferences.ini'), QSettings.Format.IniFormat))
             window.show()
             app.processEvents()
@@ -61,7 +65,7 @@ def main(arguments: list[str]) -> int:
             QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
             QTimer.singleShot(0, app.quit)
             app.exec()
-            result.update(ok=True, gui=True, mp3=True, m4a=True, worker=True)
+            result.update(ok=True, gui=True, fonts=True, mp3=True, m4a=True, worker=True)
     except Exception as exc:
         result['error_type'] = type(exc).__name__
     result_file.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
