@@ -1,10 +1,12 @@
 # GitHub contents and release checklist
 
+English | [简体中文](RELEASING.zh-CN.md)
+
 ## Essential repository components
 
 | Component | Location |
 | --- | --- |
-| Download engine, UI, worker, platform handling | `bilisong/`, `main.py` |
+| Download engine, UI, worker, platform handling | `audioporter/`, `main.py` |
 | Pinned runtime and build dependencies | `requirements.txt`, `requirements-dev.txt` |
 | Native reproducible build entry | `build_app.py`, `assets/`, `scripts/` |
 | User guide and compatibility limits | `README.md`, `docs/` |
@@ -20,7 +22,7 @@ spec, cookies, or logs. Native ZIPs and checksums are release assets, not Git bl
 
 ## Publish a version
 
-1. Update `bilisong.__version__`, the README download names, and the changelog.
+1. Update `audioporter.__version__`, the README download names, and the changelog.
 2. Run tests, build and smoke checks on each target. Check the full extracted
    distribution; a successful source test alone is insufficient.
 3. Run the privacy audit on staged source and extracted releases. Inspect commit

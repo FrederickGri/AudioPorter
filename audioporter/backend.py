@@ -166,7 +166,7 @@ class BatchRunner:
     def _worker_command(self) -> list[str]:
         if getattr(sys, "frozen", False):
             return [sys.executable, "--worker"]
-        return [sys.executable, "-m", "bilisong.worker"]
+        return [sys.executable, "-m", "audioporter.worker"]
 
     def _run_worker(self, action: str, track: Track | None = None, index: int | None = None) -> dict:
         self._check_cancel()
@@ -179,7 +179,7 @@ class BatchRunner:
         error = None
         # The parent owns cookie snapshots so forced termination never leaves
         # session credentials behind in a worker-created temporary directory.
-        with tempfile.TemporaryDirectory(prefix="bilisong-session-") as private_dir:
+        with tempfile.TemporaryDirectory(prefix="audioporter-session-") as private_dir:
             if self.settings.cookie_file:
                 snapshot = Path(private_dir) / "cookies.txt"
                 shutil.copyfile(Path(self.settings.cookie_file).expanduser(), snapshot)
@@ -332,15 +332,16 @@ class BatchRunner:
         self.settings.validate()
         destination = Path(self.settings.destination).expanduser().resolve()
         destination.mkdir(parents=True, exist_ok=True)
-        cache_path = destination / ".bilisong-completed.json"
+        cache_path = destination / ".audioporter-completed.json"
+        previous_cache = destination / '.bilisong-completed.json'
         try:
-            self._cache = json.loads(cache_path.read_text(encoding="utf-8"))
+            self._cache = json.loads((cache_path if cache_path.exists() else previous_cache).read_text(encoding="utf-8"))
             if not isinstance(self._cache, dict):
                 self._cache = {}
         except (OSError, ValueError):
             self._cache = {}
         records = [{"id": t.id, "title": t.title, "status": "pending", "message": "", "files": []} for t in tracks]
-        report_path = destination / ".bilisong-report.json"
+        report_path = destination / ".audioporter-report.json"
         completed = failed = skipped = 0
         def save_report():
             self._atomic_json(report_path, {
@@ -368,7 +369,7 @@ class BatchRunner:
 
         # Only the coordinator writes manifests/reports. Each pool slot supervises
         # one independent process group, including its own retries and converter.
-        pool = ThreadPoolExecutor(max_workers=self.settings.parallel_downloads, thread_name_prefix="BiliSong")
+        pool = ThreadPoolExecutor(max_workers=self.settings.parallel_downloads, thread_name_prefix="AudioPorter")
         pending = {}
         next_index = 0
         try:

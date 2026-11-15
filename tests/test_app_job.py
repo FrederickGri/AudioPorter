@@ -1,14 +1,14 @@
 """Check the boundary between successful downloads and optional Music imports."""
 from PySide6.QtCore import Qt
 import threading
-from bilisong.app import Job
-from bilisong.backend import Settings
+from audioporter.app import Job
+from audioporter.backend import Settings
 import pytest
 
 
 @pytest.fixture(autouse=True)
 def mac_music_platform(monkeypatch):
-    monkeypatch.setattr('bilisong.app.PLATFORM', 'darwin')
+    monkeypatch.setattr('audioporter.app.PLATFORM', 'darwin')
 
 
 class Importer:

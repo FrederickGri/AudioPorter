@@ -1,6 +1,8 @@
 # Third-party notices
 
-BiliSong's original source is MIT licensed. Dependencies retain their own terms;
+English | [简体中文](THIRD_PARTY_NOTICES.zh-CN.md)
+
+AudioPorter's original source is MIT licensed. Dependencies retain their own terms;
 the MIT license does not relicense Python, Qt, FFmpeg, or any other dependency.
 
 | Component | Use | License / upstream source |
@@ -18,7 +20,7 @@ dynamically loaded. Users may replace compatible Qt/PySide libraries in the
 unpacked application and may reverse engineer the LGPL components to debug their
 modifications. Rebuild instructions are in [Development](docs/DEVELOPMENT.md).
 
-FFmpeg is invoked as a separate executable; it is not linked into BiliSong's own
+FFmpeg is invoked as a separate executable; it is not linked into AudioPorter's own
 code. imageio-ffmpeg 0.8.1 pins each platform binary, download URL and checksum in
 its [binary manifest](https://github.com/imageio/imageio-ffmpeg/blob/v0.8.1/tools/ffmpeg-sources.json).
 Build scripts and source availability are provided by the manifest's upstream

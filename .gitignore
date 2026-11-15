@@ -22,6 +22,7 @@ release/
 *.pem
 *.key
 *cookies*
+.audioporter-*
 .bilisong-*
 *.mp3
 *.m4a

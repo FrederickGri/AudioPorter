@@ -17,8 +17,13 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     versions = []
     for package in ('PySide6-Essentials', 'shiboken6', 'yt-dlp', 'imageio-ffmpeg',
-                    'pyinstaller', 'altgraph', 'packaging', 'setuptools'):
-        dist = metadata.distribution(package)
+                    'pyinstaller', 'altgraph', 'packaging', 'setuptools',
+                    'certifi', 'brotli', 'mutagen', 'pycryptodomex', 'requests', 'urllib3',
+                    'charset-normalizer', 'idna', 'websockets'):
+        try:
+            dist = metadata.distribution(package)
+        except metadata.PackageNotFoundError:
+            continue
         versions.append(f'{package}=={dist.version}')
         for file in dist.files or []:
             if not any(word in str(file).lower() for word in ('license', 'copying', 'copyright')):

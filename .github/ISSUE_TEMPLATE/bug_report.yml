@@ -1,24 +1,24 @@
-name: Bug report
-description: Report a reproducible problem without private account data
+name: Bug report / 问题反馈
+description: Report a reproducible problem without private data / 请勿包含私人信息
 body:
   - type: markdown
     attributes:
-      value: Do not include cookies, private links, personal paths, or unreviewed logs.
+      value: Do not include cookies, private links, personal paths, or unreviewed logs. / 请勿填写 Cookie、私有链接、个人路径或未经检查的日志。
   - type: input
     id: version
     attributes:
-      label: BiliSong version
+      label: AudioPorter version / 版本
     validations:
       required: true
   - type: input
     id: platform
     attributes:
-      label: Operating system and CPU architecture
+      label: Operating system and CPU architecture / 系统与 CPU 架构
     validations:
       required: true
   - type: textarea
     id: reproduce
     attributes:
-      label: Steps, expected result, and actual result
+      label: Steps, expected result, and actual result / 操作步骤、预期结果及实际结果
     validations:
       required: true

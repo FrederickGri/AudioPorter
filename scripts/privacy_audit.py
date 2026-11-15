@@ -17,7 +17,7 @@ import types
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-PRIVATE_NAMES = re.compile(r'(^|/)(\.env(?:\..*)?|cookies(?:[^/]*\.(?:txt|json|sqlite|db))?|[^/]*cookies\.txt|\.bilisong-[^/]*|\.DS_Store|.*\.(?:pem|key|part|ytdl))$', re.I)
+PRIVATE_NAMES = re.compile(r'(^|/)(\.env(?:\..*)?|cookies(?:[^/]*\.(?:txt|json|sqlite|db))?|[^/]*cookies\.txt|\.(?:audioporter|bilisong)-[^/]*|\.DS_Store|.*\.(?:pem|key|part|ytdl))$', re.I)
 
 
 def main():
@@ -56,13 +56,15 @@ def main():
         paths = [base / name for name in names if name]
     for path in paths:
         label = path.relative_to(base).as_posix()
-        if PRIVATE_NAMES.search(label):
-            failures.add(label + ' (private filename)')
         data = path.read_bytes()
+        public_ca_bundle = (path.name == 'cacert.pem' and path.parent.name == 'certifi'
+                            and b'-----BEGIN CERTIFICATE-----' in data and b'PRIVATE KEY' not in data)
+        if PRIVATE_NAMES.search(label) and not public_ca_bundle:
+            failures.add(label + ' (private filename)')
         check(data, label)
         if data.startswith(b'PK\x03\x04'):
             check_zip(data, label)
-        if path.name in {'BiliSong', 'BiliSong.exe'}:
+        if path.name in {'AudioPorter', 'AudioPorter.exe'}:
             from PyInstaller.archive.readers import CArchiveReader
             archive = CArchiveReader(str(path))
             for name, entry in archive.toc.items():

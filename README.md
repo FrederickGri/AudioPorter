@@ -1,6 +1,12 @@
-# BiliSong
+# AudioPorter
+
+English | [简体中文](README.zh-CN.md)
 
 A desktop app for **Windows and macOS** that saves audio from a Bilibili favorites folder, collection, or video. Paste a link, choose a destination, and download the batch. Python, the download engine, and FFmpeg are included in packaged releases. BilibiliDown and Java are not required.
+
+AudioPorter was previously named BiliSong. Existing files are preserved. On first
+launch, the app can reuse the previous build's local preferences and completed
+download/Music records. The new Apple Music playlist is named **AudioPorter**.
 
 ## Downloads and platform support
 
@@ -8,9 +14,9 @@ Open this repository's **Releases** section and choose the ZIP for your system. 
 
 | System | Package | Launch |
 | --- | --- | --- |
-| Windows 11, Intel/AMD 64-bit | `BiliSong-0.3.0-Windows-amd64.zip` | Extract all files; open `BiliSong/BiliSong.exe` |
-| macOS 15+, Apple Silicon | `BiliSong-0.3.0-macOS-arm64.zip` | Open `BiliSong.app`; optionally copy to Applications |
-| macOS 15+, Intel | `BiliSong-0.3.0-macOS-x86_64.zip` | Open `BiliSong.app`; optionally copy to Applications |
+| Windows 11, Intel/AMD 64-bit | `AudioPorter-0.3.0-Windows-amd64.zip` | Extract all files; open `AudioPorter/AudioPorter.exe` |
+| macOS 15+, Apple Silicon | `AudioPorter-0.3.0-macOS-arm64.zip` | Open `AudioPorter.app`; optionally copy to Applications |
+| macOS 15+, Intel | `AudioPorter-0.3.0-macOS-x86_64.zip` | Open `AudioPorter.app`; optionally copy to Applications |
 
 These are separate native builds, not a universal binary. Windows ARM64 and 32-bit Windows are not currently release targets. Windows 10 and older macOS versions are not part of the validation matrix.
 
@@ -20,7 +26,7 @@ The app is unsigned and the Mac build is not notarized. Windows or macOS may sho
 
 ## Open the app
 
-After building locally, open `dist/BiliSong.app` on macOS or `dist/BiliSong/BiliSong.exe` on Windows. Keep the Windows executable together with its `_internal` directory.
+After building locally, open `dist/AudioPorter.app` on macOS or `dist/AudioPorter/AudioPorter.exe` on Windows. Keep the Windows executable together with its `_internal` directory.
 
 To run from source instead, use Python 3.12–3.14 (CI uses 3.12):
 
@@ -43,7 +49,7 @@ py -3.12 -m venv .venv
 1. Paste the URL of a specific Bilibili favorites folder or creator collection. Favorites links normally include a folder ID, for example `https://space.bilibili.com/12345/favlist?fid=67890`.
 2. Choose the destination directory.
 3. Choose MP3, then select Best quality (VBR V0), 320, 256, 192, or 128 kbps. Best is the default; an already-MP3 source is preserved in Best mode, while explicit bitrates are re-encoded. M4A copies AAC sources without re-encoding, or converts other source codecs to AAC at 320 kbps.
-4. On macOS, leave automatic Music import enabled to add completed audio to the Music app's **BiliSong** playlist, or turn it off to download files only. On Windows, open the saved files with your preferred music player; automatic Apple Music import is not available.
+4. On macOS, leave automatic Music import enabled to add completed audio to the Music app's **AudioPorter** playlist, or turn it off to download files only. On Windows, open the saved files with your preferred music player; automatic Apple Music import is not available.
 5. Set Parallel downloads from 1 to 6 (default 3), then start the batch. The app first collects the folder entries across all pages, then downloads up to that many items simultaneously. A failed entry does not stop the remaining batch. Music imports use a separate serial queue, so they do not occupy download slots.
 6. Review the queue when the batch finishes. Retry failed entries after fixing any connection or login problem.
 
@@ -59,9 +65,9 @@ Cookies are used locally to authenticate requests to Bilibili. Do not share a co
 
 ## Import into Apple Music
 
-Automatic import adds local downloaded MP3 or M4A files to your Music library and its **BiliSong** playlist. On the first import, macOS may ask whether BiliSong can control Music. Allow access to use this feature. If permission was denied, it can be changed in System Settings → Privacy & Security → Automation.
+Automatic import adds local downloaded MP3 or M4A files to your Music library and its **AudioPorter** playlist. On the first import, macOS may ask whether AudioPorter can control Music. Allow access to use this feature. If permission was denied, it can be changed in System Settings → Privacy & Security → Automation.
 
-The app stores returned Music track IDs in `.bilisong-music.json` in the download destination and checks them on later imports to avoid adding the same downloaded file repeatedly. Keep that record if you want repeated runs to recognize earlier imports. Music may copy files into its own media folder according to its settings. An import problem leaves downloaded files intact; Music setup or automation prompts may need attention before retrying.
+The app stores returned Music track IDs in `.audioporter-music.json` in the download destination and checks them on later imports to avoid adding the same downloaded file repeatedly. Keep that record if you want repeated runs to recognize earlier imports. Music may copy files into its own media folder according to its settings. An import problem leaves downloaded files intact; Music setup or automation prompts may need attention before retrying.
 
 ## Reliability and saved files
 
@@ -70,8 +76,8 @@ The app stores returned Music track IDs in `.bilisong-music.json` in the downloa
 - Stop cancels every active download and converter, and prevents queued downloads/imports from starting. A later run can reuse partial downloads where the server supports resuming.
 - Audio files are saved beneath the selected destination in folders such as `mp3/best/`, `mp3/320/`, or `m4a/source/`. Different quality versions are kept separately. Existing files, including older 192 kbps downloads, are preserved. Download history includes the selected quality, so a lower-quality file is never treated as an upgraded output. The 0.2 source-selection policy starts fresh history entries rather than assuming older outputs match it.
 - Completed files retain readable titles and stable identifiers to avoid collisions. Repeating a batch at the same quality skips output when all recorded files still exist and are nonempty.
-- A `.bilisong-report.json` file in the destination records the latest batch results.
-- Unfinished downloads and conversions stay in `.bilisong-work/`. Successful conversion output is published to the format folder without replacing an existing different file.
+- A `.audioporter-report.json` file in the destination records the latest batch results.
+- Unfinished downloads and conversions stay in `.audioporter-work/`. Successful conversion output is published to the format folder without replacing an existing different file.
 
 Collection listings depend on Bilibili's current site behavior and yt-dlp's support. An account-specific full download must be verified with a real folder link and any required login.
 
@@ -92,7 +98,7 @@ The tests exercise local queue, retry, timeout, cancellation, and validation beh
 
 No analytics or crash-upload service is configured. Preferences (including your last URL and local paths) are saved locally through Qt; reports and history are saved in your chosen download destination. Session cookies authenticate requests to Bilibili. See [Privacy](docs/PRIVACY.md) before sharing logs or screenshots.
 
-Original BiliSong code is licensed under [MIT](LICENSE). Bundled dependencies keep their own licenses; see [Third-party notices](THIRD_PARTY_NOTICES.md). Download only content you have permission to save, and follow the site's terms and applicable law. This project is not affiliated with Bilibili or Apple.
+Original AudioPorter code is licensed under [MIT](LICENSE). Bundled dependencies keep their own licenses; see [Third-party notices](THIRD_PARTY_NOTICES.md). Download only content you have permission to save, and follow the site's terms and applicable law. This project is not affiliated with Bilibili or Apple.
 
 - [Development and native builds](docs/DEVELOPMENT.md)
 - [Compatibility and troubleshooting](docs/COMPATIBILITY.md)

@@ -1,5 +1,7 @@
 # Compatibility and troubleshooting
 
+English | [简体中文](COMPATIBILITY.zh-CN.md)
+
 ## What is verified
 
 The workflow runs the test suite separately on Windows Server 2022 (x64), macOS

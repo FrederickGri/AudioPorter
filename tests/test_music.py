@@ -9,13 +9,13 @@ import time
 
 import pytest
 
-from bilisong.backend import CancelledError
-from bilisong.music import IMPORT_SCRIPT, MusicImporter
+from audioporter.backend import CancelledError
+from audioporter.music import IMPORT_SCRIPT, MusicImporter
 
 
 @pytest.fixture
 def importer(tmp_path, monkeypatch):
-    monkeypatch.setattr("bilisong.music.sys.platform", "darwin")
+    monkeypatch.setattr("audioporter.music.sys.platform", "darwin")
     return MusicImporter(str(tmp_path))
 
 
@@ -27,7 +27,7 @@ def audio(importer, name="test.mp3", content=b"synthetic test bytes"):
 
 
 def test_manifest_uses_music_id_after_music_copies_file(importer, monkeypatch):
-    source = audio(importer, '音乐 / song unicode.mp3' if os.name == 'nt' else '音乐 / song "quotes"; $(untouched).mp3')
+    source = audio(importer, '音乐/song unicode.mp3' if os.name == 'nt' else '音乐 / song "quotes"; $(untouched).mp3')
     calls = []
 
     def music_boundary(path, known_id, cancel_event):
@@ -73,6 +73,23 @@ def test_changed_file_is_not_skipped_and_duplicate_arguments_are_deduplicated(im
     source.write_bytes(b"replacement, deliberately different size")
     assert importer.import_files(["test.mp3"])["imported"] == 1
     assert seen == ["", ""]
+
+
+def test_rename_preserves_legacy_music_ids(importer, monkeypatch):
+    audio(importer)
+    signature = importer._file('test.mp3')[1]
+    previous = importer.destination / '.bilisong-music.json'
+    previous.write_text(json.dumps({'version': 1, 'files': {
+        signature: {'persistent_id': '0123456789ABCDEF'}
+    }}), encoding='utf-8')
+    observed = []
+    def boundary(path, known_id, cancel_event):
+        observed.append(known_id)
+        return 'already_imported', known_id
+    monkeypatch.setattr(importer, '_import_one', boundary)
+    assert importer.import_files(['test.mp3'])['already_imported'] == 1
+    assert observed == ['0123456789ABCDEF']
+    assert previous.is_file() and importer.manifest_path.is_file()
 
 
 def test_successful_import_record_survives_later_failure(importer, monkeypatch):
@@ -132,10 +149,10 @@ def test_manifest_write_failure_stops_before_import(importer, monkeypatch):
     def cannot_replace(*args):
         raise PermissionError("Destination is not writable")
 
-    monkeypatch.setattr("bilisong.music.os.replace", cannot_replace)
+    monkeypatch.setattr("audioporter.music.os.replace", cannot_replace)
     with pytest.raises(RuntimeError, match="destination is writable"):
         importer.import_files(["test.mp3"])
-    assert not list(importer.destination.glob(".bilisong-music-*.tmp"))
+    assert not list(importer.destination.glob(".audioporter-music-*.tmp"))
     assert (importer.destination / "test.mp3").is_file()
 
 
@@ -160,7 +177,7 @@ def test_script_paths_are_passed_only_as_arguments(importer, monkeypatch):
         captured.append((args, kwargs))
         return CompletedProcess()
 
-    monkeypatch.setattr("bilisong.music.subprocess.Popen", spawn)
+    monkeypatch.setattr("audioporter.music.subprocess.Popen", spawn)
     assert importer._import_one(source, "", None) == ("imported", "0123456789ABCDEF")
     args, kwargs = captured[0]
     assert args == ["/usr/bin/osascript", "-e", IMPORT_SCRIPT, str(source), ""]
@@ -171,7 +188,7 @@ def test_script_paths_are_passed_only_as_arguments(importer, monkeypatch):
 
 def test_automation_denial_explains_fix_and_preserves_audio(importer, monkeypatch):
     source = audio(importer)
-    monkeypatch.setattr("bilisong.music.subprocess.Popen", lambda *a, **k: CompletedProcess(error="Not authorized to send Apple events to Music. (-1743)", returncode=1))
+    monkeypatch.setattr("audioporter.music.subprocess.Popen", lambda *a, **k: CompletedProcess(error="Not authorized to send Apple events to Music. (-1743)", returncode=1))
     with pytest.raises(RuntimeError, match="Privacy & Security → Automation"):
         importer.import_files(["test.mp3"])
     assert source.read_bytes() == b"synthetic test bytes"
@@ -181,7 +198,7 @@ def test_automation_denial_explains_fix_and_preserves_audio(importer, monkeypatc
 @pytest.mark.parametrize("reply", ["", "imported\tbad-id", "unexpected\t0123456789ABCDEF"])
 def test_unconfirmed_import_is_not_recorded(importer, monkeypatch, reply):
     audio(importer)
-    monkeypatch.setattr("bilisong.music.subprocess.Popen", lambda *a, **k: CompletedProcess(output=reply))
+    monkeypatch.setattr("audioporter.music.subprocess.Popen", lambda *a, **k: CompletedProcess(output=reply))
     with pytest.raises(RuntimeError, match="did not confirm"):
         importer.import_files(["test.mp3"])
     assert json.loads(importer.manifest_path.read_text())["files"] == {}
@@ -200,7 +217,7 @@ def test_timeout_or_cancellation_kills_supervised_process(importer, monkeypatch,
         children.append(process)
         return process
 
-    monkeypatch.setattr("bilisong.music.subprocess.Popen", fake_music)
+    monkeypatch.setattr("audioporter.music.subprocess.Popen", fake_music)
     event = threading.Event()
     if cancel:
         timer = threading.Timer(0.15, event.set)
@@ -222,7 +239,7 @@ def test_timeout_or_cancellation_kills_supervised_process(importer, monkeypatch,
 def test_cancelled_before_start_never_invokes_music(importer, monkeypatch):
     event = threading.Event()
     event.set()
-    monkeypatch.setattr("bilisong.music.subprocess.Popen", lambda *a, **k: pytest.fail("Must not invoke Music"))
+    monkeypatch.setattr("audioporter.music.subprocess.Popen", lambda *a, **k: pytest.fail("Must not invoke Music"))
     with pytest.raises(CancelledError):
         importer.import_files([], event)
 

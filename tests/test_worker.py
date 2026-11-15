@@ -2,7 +2,7 @@ import errno
 
 import pytest
 
-from bilisong.worker import base_options, flatten_entries, promote_file, scan
+from audioporter.worker import base_options, flatten_entries, promote_file, scan
 
 
 def test_flatten_exhausts_nested_lazy_pages():
@@ -105,7 +105,7 @@ def test_publishing_works_on_filesystem_without_hardlinks(tmp_path, monkeypatch)
     def unsupported(*args):
         raise OSError(errno.EOPNOTSUPP, "not supported")
 
-    monkeypatch.setattr("bilisong.worker.os.link", unsupported)
+    monkeypatch.setattr("audioporter.worker.os.link", unsupported)
     target = promote_file(source, tmp_path / "output")
     assert target.read_bytes() == b"completed audio"
     assert not source.exists()

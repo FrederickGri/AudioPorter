@@ -7,7 +7,7 @@ import time
 
 import pytest
 
-from bilisong.backend import BatchRunner, CancelledError, Settings, Track, normalize_url, safe_message
+from audioporter.backend import BatchRunner, CancelledError, Settings, Track, normalize_url, safe_message
 
 
 def assert_process_exited(pid):
@@ -94,7 +94,7 @@ def test_exhausted_entry_does_not_stop_remaining_batch(tmp_path, monkeypatch):
     assert delays == [2, 4]
     result = events[-1]
     assert result["failed"] == 1 and result["completed"] == 2
-    report = json.loads((tmp_path / ".bilisong-report.json").read_text())
+    report = json.loads((tmp_path / ".audioporter-report.json").read_text())
     assert [entry["status"] for entry in report["entries"]] == ["failed", "completed", "completed"]
 
 
@@ -155,7 +155,7 @@ def test_cancel_during_backoff_does_not_start_next_entry(tmp_path, monkeypatch):
     runner.download(tracks())
     assert attempts == [0]
     assert events[-1]["cancelled"] is True
-    report = json.loads((tmp_path / ".bilisong-report.json").read_text())
+    report = json.loads((tmp_path / ".audioporter-report.json").read_text())
     assert [entry["status"] for entry in report["entries"]] == ["cancelled", "pending", "pending"]
 
 
@@ -222,3 +222,16 @@ def test_frozen_worker_command_reuses_bundle_executable(tmp_path, monkeypatch):
     runner, _ = make_runner(tmp_path)
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     assert runner._worker_command() == [sys.executable, "--worker"]
+
+
+def test_rename_reuses_legacy_completed_history(tmp_path, monkeypatch):
+    runner, events = make_runner(tmp_path)
+    song = tracks()[0]
+    (tmp_path / 'saved.mp3').write_bytes(b'completed audio')
+    (tmp_path / '.bilisong-completed.json').write_text(json.dumps({
+        runner._cache_key(song): {'files': ['saved.mp3'], 'title': 'Saved song'}
+    }), encoding='utf-8')
+    monkeypatch.setattr(runner, '_run_worker', lambda *args: pytest.fail('Must reuse existing output'))
+    runner.download([song])
+    assert events[-1]['skipped'] == 1
+    assert song.title == 'Saved song'

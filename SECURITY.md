@@ -1,5 +1,7 @@
 # Security
 
+English | [简体中文](SECURITY.zh-CN.md)
+
 Do not put cookies, tokens, account identifiers, or private logs in public issues.
 For a suspected vulnerability, use this repository's GitHub **Security → Report
 a vulnerability** feature when enabled. If unavailable, open a minimal issue

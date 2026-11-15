@@ -12,7 +12,7 @@ from . import __version__
 
 def main(arguments: list[str]) -> int:
     if len(arguments) != 1:
-        raise SystemExit('Usage: BiliSong --smoke-test RESULT.json')
+        raise SystemExit('Usage: AudioPorter --smoke-test RESULT.json')
     result_file = Path(arguments[0]).resolve()
     result = {'version': __version__, 'ok': False}
     try:
@@ -21,9 +21,9 @@ def main(arguments: list[str]) -> int:
         from PySide6.QtWidgets import QApplication
         from .app import Window, apply_theme
         from .backend import BatchRunner, Settings
-        with tempfile.TemporaryDirectory(prefix='bilisong-smoke-') as temporary:
+        with tempfile.TemporaryDirectory(prefix='audioporter-smoke-') as temporary:
             work = Path(temporary)
-            app = QApplication.instance() or QApplication(['BiliSong smoke test'])
+            app = QApplication.instance() or QApplication(['AudioPorter smoke test'])
             apply_theme(app)
             window = Window(QSettings(str(work / 'preferences.ini'), QSettings.Format.IniFormat))
             window.show()

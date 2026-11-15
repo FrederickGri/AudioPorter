@@ -9,7 +9,7 @@ import pytest
 from yt_dlp import YoutubeDL
 from yt_dlp.postprocessor.ffmpeg import FFmpegExtractAudioPP
 
-from bilisong.worker import download
+from audioporter.worker import download
 
 
 @pytest.mark.parametrize("audio_format", ["mp3", "m4a"])
@@ -41,7 +41,7 @@ def test_retry_rebuilds_interrupted_conversion_and_preserves_saved_m4a(tmp_path,
 
     destination = tmp_path / "music"
     url = "https://www.bilibili.com/video/BVTEST"
-    staging = destination / ".bilisong-work" / "mp3" / "best" / hashlib.sha256(url.encode()).hexdigest()[:24]
+    staging = destination / ".audioporter-work" / "mp3" / "best" / hashlib.sha256(url.encode()).hexdigest()[:24]
     staging.mkdir(parents=True)
     (staging / "Synthetic [BVTEST].m4a").write_bytes(media.read_bytes())
     (staging / "Synthetic [BVTEST].mp3").write_bytes(b"truncated audio")

@@ -10,7 +10,7 @@ import pytest
 def qt_app():
     from PySide6.QtCore import QTimer
     from PySide6.QtWidgets import QApplication
-    app = QApplication.instance() or QApplication(['BiliSong tests'])
+    app = QApplication.instance() or QApplication(['AudioPorter tests'])
     yield app
     QTimer.singleShot(0, app.quit)
     app.exec()

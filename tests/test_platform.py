@@ -6,12 +6,12 @@ import time
 import pytest
 from PySide6.QtCore import QCoreApplication, QEvent, QSettings
 
-from bilisong.app import Job, Window, apply_theme
-from bilisong.backend import BatchRunner, CancelledError, Settings, Track
+from audioporter.app import Job, Window, apply_theme
+from audioporter.backend import BatchRunner, CancelledError, Settings, Track
 
 
 def test_windows_ui_hides_mac_features_and_survives_busy_cycle(tmp_path, monkeypatch, qt_app):
-    monkeypatch.setattr('bilisong.app.PLATFORM', 'win32')
+    monkeypatch.setattr('audioporter.app.PLATFORM', 'win32')
     app = qt_app
     apply_theme(app)
     prefs = QSettings(str(tmp_path / 'settings.ini'), QSettings.Format.IniFormat)

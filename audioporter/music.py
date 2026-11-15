@@ -29,9 +29,9 @@ on run argv
                 set matchingTracks to (every file track of library playlist 1 whose persistent ID is knownID)
                 if (count of matchingTracks) > 0 then set existingTrack to item 1 of matchingTracks
             end if
-            set matchingPlaylists to (every user playlist whose name is "BiliSong" and smart is false)
+            set matchingPlaylists to (every user playlist whose name is "AudioPorter" and smart is false)
             if (count of matchingPlaylists) is 0 then
-                set targetPlaylist to make new user playlist with properties {name:"BiliSong"}
+                set targetPlaylist to make new user playlist with properties {name:"AudioPorter"}
             else
                 set targetPlaylist to item 1 of matchingPlaylists
             end if
@@ -65,7 +65,7 @@ class MusicImporter:
 
     def __init__(self, destination: str):
         self.destination = Path(destination).expanduser().resolve()
-        self.manifest_path = self.destination / ".bilisong-music.json"
+        self.manifest_path = self.destination / ".audioporter-music.json"
 
     @staticmethod
     def _check_cancel(cancel_event: threading.Event | None) -> None:
@@ -74,18 +74,19 @@ class MusicImporter:
 
     def _read_manifest(self) -> dict:
         try:
-            data = json.loads(self.manifest_path.read_text(encoding="utf-8"))
+            record = self.manifest_path if self.manifest_path.exists() else self.destination / '.bilisong-music.json'
+            data = json.loads(record.read_text(encoding="utf-8"))
         except FileNotFoundError:
             return {"version": 1, "files": {}}
         except (OSError, ValueError) as exc:
             # Silently discarding an unreadable manifest could duplicate a library.
-            raise RuntimeError("The Music import record could not be read. Downloaded audio is preserved; restore .bilisong-music.json before importing again.") from exc
+            raise RuntimeError("The Music import record could not be read. Downloaded audio is preserved; restore .audioporter-music.json before importing again.") from exc
         if not isinstance(data, dict) or data.get("version") != 1 or not isinstance(data.get("files"), dict):
             raise RuntimeError("The Music import record has an unsupported format. Downloaded audio is preserved.")
         return data
 
     def _save_manifest(self, manifest: dict) -> None:
-        descriptor, name = tempfile.mkstemp(prefix=".bilisong-music-", suffix=".tmp", dir=self.destination)
+        descriptor, name = tempfile.mkstemp(prefix=".audioporter-music-", suffix=".tmp", dir=self.destination)
         try:
             with os.fdopen(descriptor, "w", encoding="utf-8") as output:
                 json.dump(manifest, output, ensure_ascii=False, indent=2)
@@ -146,7 +147,7 @@ class MusicImporter:
                     continue
             if process.returncode:
                 if "-1743" in error or "not authorized" in error.lower() or "not permitted" in error.lower():
-                    raise RuntimeError("Apple Music automation permission was denied. Allow BiliSong to control Music in System Settings → Privacy & Security → Automation, then retry. Downloaded audio is preserved.")
+                    raise RuntimeError("Apple Music automation permission was denied. Allow AudioPorter to control Music in System Settings → Privacy & Security → Automation, then retry. Downloaded audio is preserved.")
                 if "-1712" in error:
                     raise RuntimeError("Apple Music did not respond in time. Open Music and finish any setup prompts, then retry. Downloaded audio is preserved.")
                 raise RuntimeError("Apple Music could not import this audio. Open Music, finish any setup prompts, and retry. Downloaded audio is preserved.")

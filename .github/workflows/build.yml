@@ -42,7 +42,7 @@ jobs:
         shell: python
         run: |
           import os
-          from bilisong import __version__
+          from audioporter import __version__
           assert os.environ['GITHUB_REF_NAME'] == 'v' + __version__
       - name: Audit source privacy
         run: python scripts/privacy_audit.py
@@ -57,9 +57,9 @@ jobs:
         run: |
           from pathlib import Path
           import subprocess, sys, tempfile, zipfile
-          archives = list(Path('dist').glob('BiliSong-*.zip'))
+          archives = list(Path('dist').glob('AudioPorter-*.zip'))
           assert len(archives) == 1
-          with tempfile.TemporaryDirectory(prefix='bilisong-audit-') as temporary:
+          with tempfile.TemporaryDirectory(prefix='audioporter-audit-') as temporary:
               with zipfile.ZipFile(archives[0]) as archive:
                   archive.extractall(temporary)
               subprocess.run([sys.executable, 'scripts/privacy_audit.py', '--tree', temporary], check=True)
@@ -68,15 +68,15 @@ jobs:
         run: |
           import hashlib
           from pathlib import Path
-          for archive in Path('dist').glob('BiliSong-*.zip'):
+          for archive in Path('dist').glob('AudioPorter-*.zip'):
               archive.with_suffix('.zip.sha256').write_text(hashlib.sha256(archive.read_bytes()).hexdigest() + '  ' + archive.name + '\n', encoding='utf-8')
       - name: Upload validated package
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
-          name: BiliSong-${{ matrix.label }}
+          name: AudioPorter-${{ matrix.label }}
           path: |
-            dist/BiliSong-*.zip
-            dist/BiliSong-*.zip.sha256
+            dist/AudioPorter-*.zip
+            dist/AudioPorter-*.zip.sha256
             dist/smoke-result.json
             dist/smoke-result.png
           if-no-files-found: error
@@ -91,7 +91,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
         with:
-          pattern: BiliSong-*
+          pattern: AudioPorter-*
           path: release
           merge-multiple: true
       - name: Create draft release for review
@@ -99,4 +99,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" release/*.zip release/*.sha256 --draft --verify-tag --title "BiliSong $RELEASE_TAG" --notes "Native Windows x64, Apple Silicon and Intel macOS packages. Each passed native CI tests and packaged offline GUI/audio/worker checks. Windows 11 interactive acceptance and third-party corresponding-source availability must be reviewed before publishing. See docs/COMPATIBILITY.md and docs/RELEASING.md. Packages are unsigned."
+        run: gh release create "$RELEASE_TAG" release/*.zip release/*.sha256 --draft --verify-tag --title "AudioPorter $RELEASE_TAG" --notes "Native Windows x64, Apple Silicon and Intel macOS packages. Each passed native CI tests and packaged offline GUI/audio/worker checks. Windows 11 interactive acceptance and third-party corresponding-source availability must be reviewed before publishing. See docs/COMPATIBILITY.md and docs/RELEASING.md. Packages are unsigned. / 提供 Windows x64、Apple Silicon 与 Intel Mac 原生包，均通过原生 CI 和打包应用离线界面、音频及工作进程检查。发布前需核查 Windows 11 交互验收和第三方对应源码访问；详见中文兼容性与发行指南。软件包未签名。"
