@@ -4,7 +4,7 @@ English | [简体中文](CHANGELOG.zh-CN.md)
 
 ## 0.3.0
 
-- Rename the app to AudioRaven / 收藏夹血鸦 and add English/Chinese documentation.
+- Rename BiliSong to AudioRaven / 收藏夹血鸦 and add English/Chinese documentation.
 - Add a crimson, bone and brass interface with vector raven heraldry.
 - Bundle an OFL-licensed Chinese/English font and check required glyphs in packaged apps.
 
@@ -14,6 +14,16 @@ English | [简体中文](CHANGELOG.zh-CN.md)
 - Preserve UTF-8 titles and portable report paths across platforms.
 - Add native CI builds, packaged offline checks, release ZIPs and checksums.
 - Add MIT licensing, dependency notices, privacy auditing, and GitHub guides.
+
+### Upgrading from BiliSong
+
+Existing audio files are preserved. On first launch, AudioRaven can reuse the
+previous build's local preferences and completed download/Music records. The
+new Apple Music playlist is named **AudioRaven**.
+
+Earlier 0.1 builds preferred M4A sources and converted MP3 at a fixed 192 kbps.
+The 0.2 source-selection policy starts fresh history entries rather than assuming
+older outputs match it. Existing audio, including older 192 kbps files, is preserved.
 
 ## 0.2.1
 

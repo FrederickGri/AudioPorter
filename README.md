@@ -2,19 +2,27 @@
 
 English | [简体中文](README.zh-CN.md)
 
-A desktop app for **Windows and macOS** that saves audio from a Bilibili favorites folder, collection, or video. Paste a link, choose a destination, and download the batch. Python, the download engine, and FFmpeg are included in packaged releases. BilibiliDown and Java are not required.
+**Your favorites have been requisitioned.**
 
-The interface uses a Blood Ravens inspired crimson, bone, and brass archive theme.
+Batch-download audio from Bilibili favorites folders and creator collections, or save an individual video's audio as **MP3 or M4A**. Available for **Windows and macOS**.
+
+Paste a link, choose a folder, and let the ravens bring the music home.
+
+[Download the latest release](https://github.com/FrederickGri/AudioRaven/releases/latest) · [Quick start](#download-a-folder)
 
 ![AudioRaven interface with empty account fields](docs/images/interface.png)
 
-AudioRaven was previously named BiliSong. Existing files are preserved. On first
-launch, the app can reuse the previous build's local preferences and completed
-download/Music records. The new Apple Music playlist is named **AudioRaven**.
+## What it does
+
+- Batch-download the available audio in a favorites folder or creator collection.
+- Save as MP3 or M4A, with selectable MP3 output quality.
+- Download in parallel, retry failed entries, and stop running tasks.
+- On macOS, add saved audio to the **AudioRaven** playlist in Apple Music.
+- Browse your queue in a Blood Ravens inspired archive interface: crimson, bone, brass, and a raven seal.
 
 ## Downloads and platform support
 
-Open this repository's **Releases** section and choose the ZIP for your system. Extract it completely before opening the app.
+Choose the ZIP for your system from [Releases](https://github.com/FrederickGri/AudioRaven/releases/latest). Extract it completely, then open the app.
 
 | System | Package | Launch |
 | --- | --- | --- |
@@ -24,31 +32,9 @@ Open this repository's **Releases** section and choose the ZIP for your system. 
 
 These are separate native builds, not a universal binary. Windows ARM64 and 32-bit Windows are not currently release targets. Windows 10 and older macOS versions are not part of the validation matrix.
 
-**Validation status:** macOS can be tested locally. Windows support must pass the native Windows CI job and packaged smoke checks before a Windows binary is released. A CI pass does not guarantee every PC, browser cookie store, or Bilibili account will work. See [compatibility and troubleshooting](docs/COMPATIBILITY.md).
+See [compatibility and troubleshooting](docs/COMPATIBILITY.md) for tested environments, account-access limits, and common fixes.
 
 The app is unsigned and the Mac build is not notarized. Windows or macOS may show an unknown-publisher warning. Verify the release source and SHA-256 checksums before deciding whether to open it. Do not disable system security protections.
-
-## Open the app
-
-After building locally, open `dist/AudioRaven.app` on macOS or `dist/AudioRaven/AudioRaven.exe` on Windows. Keep the Windows executable together with its `_internal` directory.
-
-To run from source instead, use Python 3.12–3.14 (CI uses 3.12):
-
-```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python scripts/fetch_font.py
-.venv/bin/python main.py
-```
-
-On Windows, use PowerShell (activation is not required):
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe scripts/fetch_font.py
-.\.venv\Scripts\python.exe main.py
-```
 
 ## Download a folder
 
@@ -61,7 +47,7 @@ py -3.12 -m venv .venv
 
 The app also accepts supported individual Bilibili video links. For account favorites, use a specific folder link instead of your account's profile URL. A folder may contain removed, private, or otherwise unavailable videos; these cannot be made downloadable by retrying.
 
-The app selects yt-dlp's best available audio source, falling back to combined video/audio when necessary. Account access can affect the available source formats. Output quality controls conversion; a larger bitrate cannot restore detail missing from the source. Best MP3 uses VBR quality 0, not a promise of lossless audio. The activity log shows source codec and approximate bitrate when available. The earlier 0.1 release preferred M4A sources and used a fixed 192 kbps MP3 conversion.
+AudioRaven selects the best audio source available to your account, falling back to combined video/audio when necessary. Output quality controls conversion; a larger bitrate cannot restore detail missing from the source. Best MP3 uses VBR quality 0, not a promise of lossless audio. The activity log shows source codec and approximate bitrate when available.
 
 ## Account access
 
@@ -80,7 +66,7 @@ The app stores returned Music track IDs in `.audioraven-music.json` in the downl
 - Request timeout limits a stalled network request. Per-item timeout also limits the complete download/conversion attempt, including an unresponsive converter.
 - Retries use increasing delays and are bounded. A retry count of 3 means up to 4 attempts including the initial attempt. An exhausted item becomes failed and the rest of the queue continues.
 - Stop cancels every active download and converter, and prevents queued downloads/imports from starting. A later run can reuse partial downloads where the server supports resuming.
-- Audio files are saved beneath the selected destination in folders such as `mp3/best/`, `mp3/320/`, or `m4a/source/`. Different quality versions are kept separately. Existing files, including older 192 kbps downloads, are preserved. Download history includes the selected quality, so a lower-quality file is never treated as an upgraded output. The 0.2 source-selection policy starts fresh history entries rather than assuming older outputs match it.
+- Audio files are saved beneath the selected destination in folders such as `mp3/best/`, `mp3/320/`, or `m4a/source/`. Different quality versions are kept separately. Existing files are preserved. Download history includes the selected quality, so a lower-quality file is never treated as an upgraded output.
 - Completed files retain readable titles and stable identifiers to avoid collisions. Repeating a batch at the same quality skips output when all recorded files still exist and are nonempty.
 - A `.audioraven-report.json` file in the destination records the latest batch results.
 - Unfinished downloads and conversions stay in `.audioraven-work/`. Successful conversion output is published to the format folder without replacing an existing different file.
@@ -89,16 +75,7 @@ Collection listings depend on Bilibili's current site behavior and yt-dlp's supp
 
 ## Development and packaging
 
-```sh
-.venv/bin/python -m pip install -r requirements-dev.txt
-.venv/bin/python -m pytest -q
-.venv/bin/python build_app.py --archive
-.venv/bin/python scripts/check_package.py
-```
-
-On Windows, replace `.venv/bin/python` with `.\.venv\Scripts\python.exe`.
-
-The tests exercise local queue, retry, timeout, cancellation, and validation behavior without downloading someone else's collection. Packaging uses PyInstaller and includes yt-dlp's dynamically loaded extractors and imageio-ffmpeg's FFmpeg binary. Build natively on each target OS and CPU architecture. [PyInstaller cannot cross-compile these apps](https://pyinstaller.org/en/stable/).
+To run from source, contribute, or build a native package, follow the [development guide](docs/DEVELOPMENT.md). It includes environment setup, dependencies, tests, and packaging commands.
 
 ## Privacy, contributing, and license
 
@@ -110,5 +87,3 @@ Original AudioRaven code is licensed under [MIT](LICENSE). Bundled dependencies 
 - [Compatibility and troubleshooting](docs/COMPATIBILITY.md)
 - [Release checklist and GitHub contents](docs/RELEASING.md)
 - [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Changelog](CHANGELOG.md)
-
-If a Bilibili site change breaks extraction, update the pinned yt-dlp version in `requirements.txt`, install it, re-test, and rebuild the app. Upstream reference: [yt-dlp documentation](https://github.com/yt-dlp/yt-dlp#readme).

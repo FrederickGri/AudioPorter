@@ -2,17 +2,27 @@
 
 [English](README.md) | 简体中文
 
-将哔哩哔哩收藏夹、合集或视频中的音频保存到本地的 **Windows / macOS 桌面应用**。粘贴链接、选择保存目录，即可批量下载。发行包内含 Python、下载引擎和 FFmpeg，无需安装 Java 或 BilibiliDown。
+**你的收藏夹，现已征用。**
 
-界面采用血鸦风格的暗红、骨白与黄铜色档案终端设计。
+将 B 站收藏夹、UP 主合集或视频中的音频批量保存为 **MP3 或 M4A**。支持 **Windows 和 macOS**。
+
+粘贴链接，选好目录，让血鸦把好声音带回你的本地曲库。
+
+[下载最新版本](https://github.com/FrederickGri/AudioRaven/releases/latest) · [快速上手](#下载收藏夹)
 
 ![收藏夹血鸦界面，账号字段为空](docs/images/interface.png)
 
-AudioRaven 原名 BiliSong。已有音频文件会保留；首次启动时可沿用旧版的本地设置、已完成下载记录与 Music 导入记录。新版 Apple Music 播放列表名为 **AudioRaven**。
+## 能做什么
+
+- 批量下载收藏夹或 UP 主合集中可获取的音频。
+- 保存为 MP3 或 M4A，并选择 MP3 输出质量。
+- 并行下载、重试失败条目，随时停止正在运行的任务。
+- macOS 可将保存的音频加入 Apple Music 的 **AudioRaven** 播放列表。
+- 用暗红、骨白、黄铜和乌鸦徽记组成的血鸦档案终端，查看下载队列。
 
 ## 下载与系统支持
 
-在本仓库的 **Releases（发行版）** 中选择适合系统的 ZIP，完整解压后再打开应用。
+从 [Releases（发行版）](https://github.com/FrederickGri/AudioRaven/releases/latest) 下载对应系统的 ZIP，完整解压后打开应用。
 
 | 系统 | 文件名 | 打开方式 |
 | --- | --- | --- |
@@ -22,33 +32,9 @@ AudioRaven 原名 BiliSong。已有音频文件会保留；首次启动时可沿
 
 各平台使用独立原生构建，并非通用二进制包。暂不发行 Windows ARM64 或 32 位版本；Windows 10 和较早的 macOS 不在当前验证范围内。
 
-**验证范围：** macOS 可在本机验证。Windows 发行包必须先通过 Windows 原生 CI 测试和打包应用检查。CI 通过不代表每台电脑、每种浏览器 Cookie 存储或每个 B 站账号都一定可用。详见[兼容性与故障排查](docs/COMPATIBILITY.zh-CN.md)。
+已测试环境、账号访问限制及常见问题，见[兼容性与故障排查](docs/COMPATIBILITY.zh-CN.md)。
 
 应用未进行发行者签名，Mac 版也未经 Apple 公证。系统可能提示未知发行者；请核实下载来源与 SHA-256 校验值后，自行决定是否打开，不要关闭系统安全防护。
-
-## 从源码运行
-
-使用 Python 3.12–3.14；CI 使用 3.12。
-
-macOS：
-
-```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python scripts/fetch_font.py
-.venv/bin/python main.py
-```
-
-Windows PowerShell，无需激活虚拟环境：
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe scripts/fetch_font.py
-.\.venv\Scripts\python.exe main.py
-```
-
-本地打包后，Mac 打开 `dist/AudioRaven.app`；Windows 打开 `dist/AudioRaven/AudioRaven.exe`，并保留其旁边的 `_internal` 文件夹。
 
 ## 下载收藏夹
 
@@ -61,7 +47,7 @@ py -3.12 -m venv .venv
 
 也支持提取器支持的单个 B 站视频链接。已删除、无权限或其他不可用视频，不能仅靠重试恢复。
 
-应用选择 yt-dlp 能获取的最佳音频源，必要时使用同时含音视频的格式。账号权限可能影响可用格式。输出码率不能补回源文件缺失的细节；Best MP3 不等于无损。活动日志在有信息时显示源编码和大致码率。较早的 0.1 版偏好 M4A 源，并固定转换为 192 kbps MP3。
+应用选择账号可获取的最佳音频源，必要时使用同时含音视频的格式。输出码率不能补回源文件缺失的细节；Best MP3 不等于无损。活动日志在有信息时显示源编码和大致码率。
 
 ## 账号访问
 
@@ -89,16 +75,7 @@ Cookie 在本机读取，并用于向 B 站发起身份验证请求。不要分�
 
 ## 开发与打包
 
-```sh
-.venv/bin/python -m pip install -r requirements-dev.txt
-.venv/bin/python -m pytest -q
-.venv/bin/python build_app.py --archive
-.venv/bin/python scripts/check_package.py
-```
-
-Windows 请把 `.venv/bin/python` 换成 `.\.venv\Scripts\python.exe`。
-
-测试使用合成音频和模拟网络边界，覆盖队列、重试、超时、取消和输入验证。各系统与 CPU 架构需分别原生打包；[PyInstaller 不支持这里所需的跨平台编译](https://pyinstaller.org/en/stable/)。B 站改版导致提取失效时，应更新 `requirements.txt` 中锁定的 yt-dlp 版本，重新测试并打包。
+从源码运行、参与贡献或构建原生安装包，请阅读[开发说明](docs/DEVELOPMENT.zh-CN.md)，其中包含环境配置、依赖、测试和打包命令。
 
 ## 隐私、贡献与许可
 
