@@ -1,0 +1,15 @@
+# Changelog
+
+## 0.3.0
+
+- Add native Windows packaging, ICO icon, Windows fonts, and system Music folder.
+- Supervise Windows workers and FFmpeg with kill-on-close Job Objects.
+- Offer automatic Apple Music import and Safari login only on macOS.
+- Preserve UTF-8 titles and portable report paths across platforms.
+- Add native CI builds, packaged offline checks, release ZIPs and checksums.
+- Add MIT licensing, dependency notices, privacy auditing, and GitHub guides.
+
+## 0.2.1
+
+- Improve batch downloading, parallel downloads, output quality selection, and
+  optional macOS Music import.

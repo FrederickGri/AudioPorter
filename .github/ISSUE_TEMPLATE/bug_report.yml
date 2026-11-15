@@ -1,0 +1,24 @@
+name: Bug report
+description: Report a reproducible problem without private account data
+body:
+  - type: markdown
+    attributes:
+      value: Do not include cookies, private links, personal paths, or unreviewed logs.
+  - type: input
+    id: version
+    attributes:
+      label: BiliSong version
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and CPU architecture
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps, expected result, and actual result
+    validations:
+      required: true
