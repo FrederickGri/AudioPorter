@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from audioporter.backend import BatchRunner, Settings, Track
-from audioporter import __version__
+from audioporter import DISPLAY_NAME, __version__
 
 PLATFORM = sys.platform
 
@@ -164,7 +164,7 @@ class Job(QThread):
 class Window(QMainWindow):
     def __init__(self, preferences=None):
         super().__init__()
-        self.setWindowTitle(f"AudioPorter {__version__} — Collection audio downloader")
+        self.setWindowTitle(f"{DISPLAY_NAME} {__version__} — Collection audio downloader")
         self.resize(1060, 880)
         self.setMinimumSize(920, 760)
         self.prefs = preferences if preferences is not None else QSettings("AudioPorter", "AudioPorter")
@@ -193,7 +193,7 @@ class Window(QMainWindow):
         heading = QVBoxLayout()
         heading.setSpacing(5)
         heading.addWidget(QLabel("YOUR COLLECTION, READY TO LISTEN", objectName="eyebrow"))
-        heading.addWidget(QLabel("AudioPorter", objectName="title"))
+        heading.addWidget(QLabel(DISPLAY_NAME, objectName="title"))
         heading.addWidget(QLabel("Paste a Bilibili folder link. Save every available song in one batch.", objectName="subtitle"))
         top.addLayout(heading)
         top.addStretch()
@@ -638,6 +638,7 @@ class Window(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setApplicationName("AudioPorter")
+    app.setApplicationDisplayName(DISPLAY_NAME)
     apply_theme(app)
     window = Window()
     window.show()

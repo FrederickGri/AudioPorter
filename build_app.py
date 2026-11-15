@@ -51,6 +51,7 @@ if sys.platform == 'darwin':
         bundle_identifier='org.audioporter.desktop',
         info_plist={{
             'CFBundleShortVersionString': {version},
+            'CFBundleDisplayName': '收藏夹血鸦 · AudioPorter',
             'NSAppleEventsUsageDescription': 'AudioPorter adds downloaded audio to your Music library when you enable automatic import.',
         }},
     )
