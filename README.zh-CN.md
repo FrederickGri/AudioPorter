@@ -4,6 +4,10 @@
 
 将哔哩哔哩收藏夹、合集或视频中的音频保存到本地的 **Windows / macOS 桌面应用**。粘贴链接、选择保存目录，即可批量下载。发行包内含 Python、下载引擎和 FFmpeg，无需安装 Java 或 BilibiliDown。
 
+界面采用血鸦风格的暗红、骨白与黄铜色档案终端设计。
+
+![收藏夹血鸦界面，账号字段为空](docs/images/interface.png)
+
 AudioRaven 原名 BiliSong。已有音频文件会保留；首次启动时可沿用旧版的本地设置、已完成下载记录与 Music 导入记录。新版 Apple Music 播放列表名为 **AudioRaven**。
 
 ## 下载与系统支持

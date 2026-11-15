@@ -17,7 +17,7 @@ def main(arguments: list[str]) -> int:
     result = {'version': __version__, 'ok': False}
     try:
         import imageio_ffmpeg
-        from PySide6.QtCore import QSettings, QTimer
+        from PySide6.QtCore import QCoreApplication, QEvent, QSettings, QTimer
         from PySide6.QtWidgets import QApplication
         from .app import Window, apply_theme
         from .backend import BatchRunner, Settings
@@ -57,6 +57,8 @@ def main(arguments: list[str]) -> int:
             else:
                 raise RuntimeError('Worker protocol did not return the expected error')
             window.close()
+            window.deleteLater()
+            QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
             QTimer.singleShot(0, app.quit)
             app.exec()
             result.update(ok=True, gui=True, mp3=True, m4a=True, worker=True)

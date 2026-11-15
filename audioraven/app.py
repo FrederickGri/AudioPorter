@@ -6,8 +6,8 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from PySide6.QtCore import QSettings, QStandardPaths, Qt, QThread, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices, QFont, QPalette
+from PySide6.QtCore import QPointF, QSettings, QStandardPaths, Qt, QThread, QUrl, Signal
+from PySide6.QtGui import QColor, QDesktopServices, QFont, QPainter, QPainterPath, QPalette, QPen, QPolygonF
 from PySide6.QtWidgets import (
     QApplication, QCheckBox, QComboBox, QFileDialog, QFrame, QGridLayout, QHBoxLayout,
     QHeaderView, QLabel, QLineEdit, QListView, QMainWindow, QMessageBox, QPlainTextEdit,
@@ -21,55 +21,59 @@ from audioraven import DISPLAY_NAME, __version__
 PLATFORM = sys.platform
 
 STYLE = """
-QMainWindow, QWidget#root { background: #f4f6fa; color: #172b45; }
-QWidget { font-size: 13px; color: #172b45; }
-QLabel#eyebrow { color: #087f85; font-weight: 700; font-size: 11px; }
-QLabel#title { font-size: 28px; font-weight: 700; }
-QLabel#subtitle, QLabel#muted { color: #52657c; }
-QFrame#card { background: white; border: 1px solid #dfe5ee; border-radius: 12px; }
-QLabel#field { font-weight: 600; }
-QLineEdit, QComboBox, QSpinBox { background: white; border: 1px solid #bbc8d8; border-radius: 6px; padding: 8px; selection-background-color: #c4eeef; selection-color: #172b45; }
-QLineEdit:focus, QComboBox:focus, QSpinBox:focus { border: 2px solid #087f85; }
-QLineEdit:disabled, QComboBox:disabled, QSpinBox:disabled { background: #f1f3f7; color: #7b899b; }
-QComboBox QAbstractItemView { background: #ffffff; color: #172b45; border: 1px solid #9baec3; selection-background-color: #087f85; selection-color: #ffffff; outline: 0; padding: 4px; }
-QComboBox QAbstractItemView::item { min-height: 30px; padding: 5px 10px; color: #172b45; background: #ffffff; }
-QComboBox QAbstractItemView::item:selected { background: #087f85; color: #ffffff; }
-QToolTip { background: #ffffff; color: #172b45; border: 1px solid #9baec3; padding: 6px; }
-QPushButton { background: white; border: 1px solid #b8c6d6; border-radius: 6px; padding: 9px 15px; font-weight: 600; }
-QPushButton:hover { background: #eef6f7; border-color: #087f85; }
-QPushButton:pressed { background: #deeff0; }
-QPushButton#primary { background: #087f85; color: white; border: 1px solid #087f85; }
-QPushButton#primary:hover { background: #06696e; }
-QPushButton#primary:disabled { color: #8090a3; background: #edf0f5; border-color: #d9e0ea; }
-QPushButton:disabled { color: #8090a3; background: #edf0f5; border-color: #d9e0ea; }
-QPushButton#link { border: none; background: transparent; color: #086e76; padding: 4px 0px; text-align: left; }
-QLabel#statValue { font-size: 24px; font-weight: 700; }
-QLabel#statLabel { font-size: 12px; color: #52657c; }
-QTableWidget { background: white; alternate-background-color: #f8fafc; border: 1px solid #dfe5ee; border-radius: 8px; gridline-color: #edf0f5; selection-background-color: #dceff0; selection-color: #172b45; }
-QHeaderView::section { background: #edf2f7; color: #42566e; border: none; border-bottom: 1px solid #dfe5ee; padding: 10px 8px; font-weight: 600; }
-QProgressBar { background: #e3e9f1; border: none; border-radius: 4px; min-height: 8px; max-height: 8px; }
-QProgressBar::chunk { background: #087f85; border-radius: 4px; }
-QPlainTextEdit { background: #f8fafc; border: 1px solid #dfe5ee; border-radius: 6px; font-size: 12px; padding: 6px; }
+QMainWindow, QWidget#root { background: #121317; color: #f0e5cf; }
+QWidget { font-size: 13px; color: #f0e5cf; }
+QLabel#eyebrow { color: #d4b985; font-weight: 700; font-size: 11px; letter-spacing: 2px; }
+QLabel#title { font-family: 'Georgia'; font-size: 30px; font-weight: 700; color: #f4e9d2; }
+QLabel#subtitle, QLabel#muted { color: #bdb3a5; }
+QLabel#archiveMark { color: #d4b985; font-size: 11px; padding: 6px 0px; }
+QFrame#card { background: #1d1e23; border: 1px solid #655b4d; border-left: 4px solid #9e2737; border-radius: 3px; }
+QFrame#statCard { background: #dfd1b6; border: 1px solid #ad956b; border-left: 4px solid #9e2737; border-radius: 2px; }
+QLabel#field { color: #e2d0ab; font-weight: 600; }
+QLineEdit, QComboBox, QSpinBox { background: #111216; border: 1px solid #746a5b; border-radius: 2px; padding: 9px; selection-background-color: #73313d; selection-color: #fff4df; }
+QLineEdit:focus, QComboBox:focus, QSpinBox:focus { border: 1px solid #d5b678; background: #19191e; }
+QLineEdit:disabled, QComboBox:disabled, QSpinBox:disabled { background: #232329; color: #a89e90; border-color: #4d4841; }
+QComboBox QAbstractItemView { background: #202126; color: #f4e9d2; border: 1px solid #a58c60; selection-background-color: #813140; selection-color: #fff4df; outline: 0; padding: 4px; }
+QComboBox QAbstractItemView::item { min-height: 30px; padding: 5px 10px; color: #f4e9d2; background: #202126; }
+QComboBox QAbstractItemView::item:selected { background: #813140; color: #fff4df; }
+QToolTip { background: #e9dbc0; color: #211e1b; border: 1px solid #a58c60; padding: 7px; }
+QPushButton { background: #29282b; border: 1px solid #8c7858; border-radius: 2px; padding: 10px 15px; font-weight: 600; }
+QPushButton:hover { background: #3b2b2e; border-color: #dbc18c; }
+QPushButton:pressed { background: #602b36; }
+QPushButton#primary { background: #9d2436; color: #fff3dd; border: 1px solid #d07476; }
+QPushButton#primary:hover { background: #b63343; border-color: #f1c49e; }
+QPushButton#primary:disabled, QPushButton:disabled { color: #a69a8c; background: #252429; border-color: #514b42; }
+QPushButton#link { border: none; background: transparent; color: #d5b981; padding: 5px 0px; text-align: left; }
+QLabel#statValue { font-size: 26px; font-weight: 700; color: #7c2030; }
+QLabel#statLabel { font-size: 12px; font-weight: 600; color: #453a30; }
+QTableWidget { background: #191a1f; alternate-background-color: #212127; border: 1px solid #77664b; border-radius: 2px; gridline-color: #373238; selection-background-color: #56323a; selection-color: #fff4df; }
+QHeaderView::section { background: #302a29; color: #e2c99c; border: none; border-bottom: 2px solid #8f2b3c; padding: 11px 8px; font-weight: 600; }
+QProgressBar { background: #373036; border: 1px solid #756247; border-radius: 1px; min-height: 8px; max-height: 8px; }
+QProgressBar::chunk { background: #d2b477; border-radius: 0px; }
+QPlainTextEdit { background: #101115; color: #d3c6b1; border: 1px solid #655b4d; border-radius: 2px; font-size: 12px; padding: 8px; }
+QScrollBar:vertical { background: #18191d; width: 10px; }
+QScrollBar::handle:vertical { background: #79684c; min-height: 30px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
 """
 
 
 def apply_theme(app):
-    """Keep popup, checkbox, and disabled colors consistent in macOS dark mode."""
+    """Apply the crimson, bone and brass archive theme on every platform."""
     app.setStyle("Fusion")
-    app.styleHints().setColorScheme(Qt.ColorScheme.Light)
+    app.styleHints().setColorScheme(Qt.ColorScheme.Dark)
     palette = QPalette()
     colors = {
-        QPalette.ColorRole.Window: "#f4f6fa", QPalette.ColorRole.WindowText: "#172b45",
-        QPalette.ColorRole.Base: "#ffffff", QPalette.ColorRole.AlternateBase: "#f8fafc",
-        QPalette.ColorRole.Text: "#172b45", QPalette.ColorRole.Button: "#ffffff",
-        QPalette.ColorRole.ButtonText: "#172b45", QPalette.ColorRole.Highlight: "#087f85",
-        QPalette.ColorRole.HighlightedText: "#ffffff", QPalette.ColorRole.PlaceholderText: "#65788f",
-        QPalette.ColorRole.ToolTipBase: "#ffffff", QPalette.ColorRole.ToolTipText: "#172b45",
+        QPalette.ColorRole.Window: "#121317", QPalette.ColorRole.WindowText: "#f0e5cf",
+        QPalette.ColorRole.Base: "#191a1f", QPalette.ColorRole.AlternateBase: "#212127",
+        QPalette.ColorRole.Text: "#f0e5cf", QPalette.ColorRole.Button: "#29282b",
+        QPalette.ColorRole.ButtonText: "#f0e5cf", QPalette.ColorRole.Highlight: "#813140",
+        QPalette.ColorRole.HighlightedText: "#fff4df", QPalette.ColorRole.PlaceholderText: "#b6a992",
+        QPalette.ColorRole.ToolTipBase: "#e9dbc0", QPalette.ColorRole.ToolTipText: "#211e1b",
     }
     for role, color in colors.items():
         palette.setColor(role, QColor(color))
     for role in (QPalette.ColorRole.Text, QPalette.ColorRole.WindowText, QPalette.ColorRole.ButtonText):
-        palette.setColor(QPalette.ColorGroup.Disabled, role, QColor("#718198"))
+        palette.setColor(QPalette.ColorGroup.Disabled, role, QColor("#a89e90"))
     app.setPalette(palette)
     app.setStyleSheet(STYLE)
     app.setFont(QFont("Segoe UI" if PLATFORM == "win32" else "Helvetica Neue", 13))
@@ -82,6 +86,45 @@ def readable_combo():
     combo.setView(QListView(combo))
     combo.setItemDelegate(QStyledItemDelegate(combo))
     return combo
+
+
+class RavenSeal(QWidget):
+    """Vector heraldry that stays sharp at high DPI without external assets."""
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFixedSize(76, 86)
+        self.setAccessibleName('Blood raven archive seal')
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.scale(self.width() / 100, self.height() / 112)
+        shield = QPainterPath()
+        shield.moveTo(7, 6)
+        shield.lineTo(93, 6)
+        shield.lineTo(89, 74)
+        shield.quadTo(81, 94, 50, 107)
+        shield.quadTo(19, 94, 11, 74)
+        shield.closeSubpath()
+        painter.setPen(QPen(QColor('#bc9c65'), 2))
+        painter.setBrush(QColor('#852334'))
+        painter.drawPath(shield)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor('#efe2c6'))
+        wing = [(48, 51), (15, 25), (18, 47), (30, 56), (19, 52),
+                (24, 65), (38, 70), (30, 69), (39, 82), (49, 70)]
+        for mirror in (False, True):
+            painter.drawPolygon(QPolygonF([QPointF(100 - x if mirror else x, y) for x, y in wing]))
+        painter.setBrush(QColor('#14151a'))
+        painter.drawPolygon(QPolygonF([QPointF(x, y) for x, y in
+            [(43, 44), (48, 35), (57, 36), (63, 43), (55, 44),
+             (60, 65), (52, 80), (44, 70), (46, 53)]]))
+        painter.setBrush(QColor('#e2c38d'))
+        painter.drawEllipse(QPointF(54, 40), 1.8, 1.8)
+        painter.setPen(QPen(QColor('#bc9c65'), 1))
+        painter.drawLine(QPointF(36, 92), QPointF(64, 92))
+        painter.end()
 
 
 class Job(QThread):
@@ -190,11 +233,13 @@ class Window(QMainWindow):
         layout.setSpacing(14)
 
         top = QHBoxLayout()
+        top.setSpacing(18)
+        top.addWidget(RavenSeal(), alignment=Qt.AlignmentFlag.AlignVCenter)
         heading = QVBoxLayout()
         heading.setSpacing(5)
-        heading.addWidget(QLabel("YOUR COLLECTION, READY TO LISTEN", objectName="eyebrow"))
+        heading.addWidget(QLabel("BLOOD RAVENS  /  AUDIO RELIQUARY", objectName="eyebrow"))
         heading.addWidget(QLabel(DISPLAY_NAME, objectName="title"))
-        heading.addWidget(QLabel("Paste a Bilibili folder link. Save every available song in one batch.", objectName="subtitle"))
+        heading.addWidget(QLabel("Reclaim your collection. Preserve every signal.", objectName="subtitle"))
         top.addLayout(heading)
         top.addStretch()
         self.open_folder = QPushButton("Open destination ↗")
@@ -367,7 +412,7 @@ class Window(QMainWindow):
 
     @staticmethod
     def stat(parent, label, value):
-        card = QFrame(objectName="card")
+        card = QFrame(objectName="statCard")
         box = QHBoxLayout(card)
         box.setContentsMargins(16, 12, 16, 12)
         number = QLabel(value, objectName="statValue")
@@ -522,9 +567,9 @@ class Window(QMainWindow):
         if item is None:
             return
         labels = {"queued": "Queued", "downloading": "Downloading", "retrying": "Retrying…", "completed": "Completed", "failed": "Failed", "cancelled": "Stopped", "skipped": "Already saved", "converting": "Converting"}
-        colors = {"completed": "#08756a", "skipped": "#08756a", "failed": "#b33e29", "retrying": "#855900"}
+        colors = {"completed": "#9ed4b1", "skipped": "#9ed4b1", "failed": "#ff9b90", "retrying": "#e5c273"}
         item.setText(labels.get(status, status.replace("_", " ").capitalize()))
-        item.setForeground(QColor(colors.get(status, "#42566e")))
+        item.setForeground(QColor(colors.get(status, "#d2c6b4")))
         item.setToolTip(message)
         self.update_stats()
 

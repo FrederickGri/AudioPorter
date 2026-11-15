@@ -4,6 +4,10 @@ English | [简体中文](README.zh-CN.md)
 
 A desktop app for **Windows and macOS** that saves audio from a Bilibili favorites folder, collection, or video. Paste a link, choose a destination, and download the batch. Python, the download engine, and FFmpeg are included in packaged releases. BilibiliDown and Java are not required.
 
+The interface uses a Blood Ravens inspired crimson, bone, and brass archive theme.
+
+![AudioRaven interface with empty account fields](docs/images/interface.png)
+
 AudioRaven was previously named BiliSong. Existing files are preserved. On first
 launch, the app can reuse the previous build's local preferences and completed
 download/Music records. The new Apple Music playlist is named **AudioRaven**.
