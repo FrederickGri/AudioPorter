@@ -45,9 +45,9 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         shell: python
         run: |
-          import os
-          from audioraven import __version__
-          assert os.environ['GITHUB_REF_NAME'] == 'v' + __version__
+          import os, runpy
+          version = runpy.run_path('audioraven/__init__.py')['__version__']
+          assert os.environ['GITHUB_REF_NAME'] == 'v' + version
       - name: Audit source privacy
         run: python scripts/privacy_audit.py
       - name: Run regression tests
